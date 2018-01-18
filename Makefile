@@ -3,3 +3,5 @@ create-env:
 	virtualenv env
 activate-env:
 	source env/bin/activate
+lint:
+	flake8 .
