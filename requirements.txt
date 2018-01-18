@@ -1,3 +1,4 @@
 flask==0.12.2
 Flask-API==1.1b1
 Markdown==2.6.11
+flake8
