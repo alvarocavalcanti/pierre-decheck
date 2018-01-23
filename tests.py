@@ -67,6 +67,86 @@ class ServerTest(TestCase):
 
         mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
 
+    @patch('server.requests.request')
+    def test_set_status_as_error(self, mock_request):
+        server.set_status(
+            owner='john',
+            repo='johnsrepo',
+            sha='johnscommit',
+            commit_status='error',
+            description='desc'
+        )
+
+        url = '{}repos/john/johnsrepo/statuses/johnscommit'.format(server.BASE_GITHUB_URL)
+        expected_data = {
+            "state": "error",
+            "target_url": "foo",
+            "description": "desc",
+            "context": "continuous-integration/merge-watcher"
+        }
+
+        mock_request.assert_called_once_with('POST', url, data=json.dumps(expected_data))
+
+    @patch('server.requests.request')
+    def test_set_status_as_failure(self, mock_request):
+        server.set_status(
+            owner='john',
+            repo='johnsrepo',
+            sha='johnscommit',
+            commit_status='failure',
+            description='desc'
+        )
+
+        url = '{}repos/john/johnsrepo/statuses/johnscommit'.format(server.BASE_GITHUB_URL)
+        expected_data = {
+            "state": "failure",
+            "target_url": "foo",
+            "description": "desc",
+            "context": "continuous-integration/merge-watcher"
+        }
+
+        mock_request.assert_called_once_with('POST', url, data=json.dumps(expected_data))
+
+    @patch('server.requests.request')
+    def test_set_status_as_pending(self, mock_request):
+        server.set_status(
+            owner='john',
+            repo='johnsrepo',
+            sha='johnscommit',
+            commit_status='pending',
+            description='desc'
+        )
+
+        url = '{}repos/john/johnsrepo/statuses/johnscommit'.format(server.BASE_GITHUB_URL)
+        expected_data = {
+            "state": "pending",
+            "target_url": "foo",
+            "description": "desc",
+            "context": "continuous-integration/merge-watcher"
+        }
+
+        mock_request.assert_called_once_with('POST', url, data=json.dumps(expected_data))
+
+    @patch('server.requests.request')
+    def test_set_status_as_success(self, mock_request):
+        server.set_status(
+            owner='john',
+            repo='johnsrepo',
+            sha='johnscommit',
+            commit_status='success',
+            description='desc'
+        )
+
+        url = '{}repos/john/johnsrepo/statuses/johnscommit'.format(server.BASE_GITHUB_URL)
+        expected_data = {
+            "state": "success",
+            "target_url": "foo",
+            "description": "desc",
+            "context": "continuous-integration/merge-watcher"
+        }
+
+        mock_request.assert_called_once_with('POST', url, data=json.dumps(expected_data))
+
 
 if __name__ == '__main__':
     unittest.main()
