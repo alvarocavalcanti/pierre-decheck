@@ -1,5 +1,6 @@
+import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 from flask_api import status
 from flask_testing import TestCase
@@ -27,7 +28,6 @@ class ServerTest(TestCase):
 
     @patch('server.requests.request')
     def test_sets_pending_status_after_receiving_pull_request_comment_event(self, mock_request):
-        # TODO: After receiving a PR Comment Event, the app should set a PENDING status for the PR
         payload = PR_COMMENT_EVENT
         headers = {
             "Content-Type": "application/json"
@@ -35,7 +35,14 @@ class ServerTest(TestCase):
         response = self.client.post("/prcomment", headers=headers, data=payload)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
-        mock_request.assert_called_once()
+        expected_data = {
+            "state": "pending",
+            "target_url": "foo",
+            "description": "Checking dependencies...",
+            "context": "continuous-integration/merge-watcher"
+        }
+
+        mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
 
 
 if __name__ == '__main__':
