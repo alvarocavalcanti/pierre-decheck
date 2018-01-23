@@ -20,6 +20,13 @@ def root_list():
 
 @app.route("/prcomment", methods=['POST'])
 def pull_request_comment():
+    has_github_event = request.headers.get('X-GitHub-Event', '') == 'comments'
+    has_github_delivery = True if request.headers.get('X-GitHub-Delivery', '') else False
+    has_hub_signature = request.headers.get('X-Hub-Signature', '').startswith('sha1=')
+
+    if not (has_github_delivery and has_github_event and has_hub_signature):
+        return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
+
     owner = request.data.get('pull_request', {}).get('repo', {}).get('owner', {}).get('login', '')
     repo = request.data.get('pull_request', {}).get('repo', {}).get('name', '')
     sha = request.data.get('comment', {}).get('commit_id', '')
