@@ -28,7 +28,7 @@ PR_COMMENT_EVENT = '''{
       "type": "User",
       "site_admin": false
     },
-    "body": "Maybe you should use more emojji on this line.",
+    "body": "COMMENT_BODY",
     "created_at": "2015-05-05T23:40:27Z",
     "updated_at": "2015-05-05T23:40:27Z",
     "html_url": "https://github.com/baxterthehacker/public-repo/pull/1#discussion_r29724692",

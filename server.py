@@ -11,6 +11,7 @@ STATUS_FAILURE = 'failure'
 STATUS_PENDING = 'pending'
 STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
+KEYWORDS_DEPENDS_ON = "depends on"
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -20,18 +21,46 @@ def root_list():
 
 @app.route("/prcomment", methods=['POST'])
 def pull_request_comment():
-    has_github_event = request.headers.get('X-GitHub-Event', '') == 'comments'
-    has_github_delivery = True if request.headers.get('X-GitHub-Delivery', '') else False
-    has_hub_signature = request.headers.get('X-Hub-Signature', '').startswith('sha1=')
-
-    if not (has_github_delivery and has_github_event and has_hub_signature):
+    if _does_not_have_github_headers():
         return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
 
+    owner, repo, sha = _extract_comment_info()
+    set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
+
+    dependency_id = _get_dependency_id_if_comment_has_keywords(KEYWORDS_DEPENDS_ON)
+    if dependency_id:
+        check_dependency(dependency_id)
+
+    return {}, status.HTTP_201_CREATED
+
+
+def _get_dependency_id_if_comment_has_keywords(keywords):
+    import re
+    comment_body = request.data.get('comment', {}).get("body", "").lower()
+    regex = r"(?:{}).(?:\#)(\d*)".format(keywords)
+    match = re.search(regex, comment_body)
+    if match:
+        return match.group(1)
+    return False
+
+
+def _extract_comment_info():
     owner = request.data.get('pull_request', {}).get('repo', {}).get('owner', {}).get('login', '')
     repo = request.data.get('pull_request', {}).get('repo', {}).get('name', '')
     sha = request.data.get('comment', {}).get('commit_id', '')
-    set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
-    return {}, status.HTTP_201_CREATED
+    return owner, repo, sha
+
+
+def _does_not_have_github_headers():
+    has_github_delivery, has_github_event, has_hub_signature = _extract_github_headers()
+    return not (has_github_delivery and has_github_event and has_hub_signature)
+
+
+def _extract_github_headers():
+    has_github_event = request.headers.get('X-GitHub-Event', '') == 'comments'
+    has_github_delivery = True if request.headers.get('X-GitHub-Delivery', '') else False
+    has_hub_signature = request.headers.get('X-Hub-Signature', '').startswith('sha1=')
+    return has_github_delivery, has_github_event, has_hub_signature
 
 
 def set_status(owner, repo, sha, commit_status, description=None):
@@ -50,6 +79,10 @@ def set_status(owner, repo, sha, commit_status, description=None):
     }
 
     requests.request('POST', url, data=json.dumps(payload))
+
+
+def check_dependency(dependency_id):
+    pass
 
 
 if __name__ == "__main__":
