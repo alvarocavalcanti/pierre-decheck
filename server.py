@@ -24,11 +24,10 @@ def pull_request_comment():
     if _does_not_have_github_headers():
         return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
 
-    owner, repo, sha = _extract_comment_info()
-    set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
-
     dependency_id = _get_dependency_id_if_comment_has_keywords(KEYWORDS_DEPENDS_ON)
     if dependency_id:
+        owner, repo, sha = _extract_comment_info()
+        set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
         check_dependency(dependency_id)
 
     return {}, status.HTTP_201_CREATED
