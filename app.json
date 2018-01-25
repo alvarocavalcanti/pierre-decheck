@@ -1,0 +1,11 @@
+{
+  "name": "Merge Watcher",
+  "description": "A flask API that checks dependencies for Pull Requests",
+  "keywords": [
+    "flask",
+    "python"
+  ],
+  "repository": "https://github.com/alvarocavalcanti/mergewatcher",
+  "addons": [
+  ]
+}
