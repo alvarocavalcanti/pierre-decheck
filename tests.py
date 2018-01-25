@@ -47,9 +47,26 @@ class ServerTest(TestCase):
         response = self.client.get("/prcomment", headers=self.GITHUB_HEADERS, data=payload)
         self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code)
 
+    @patch('server.check_dependency')
     @patch('server.requests.request')
-    def test_sets_pending_status_after_receiving_pull_request_comment_event(self, mock_request):
+    def test_does_nothing_when_comment_event_does_not_have_keywords(self, mock_request, mock_check_dependecy):
         payload = PR_COMMENT_EVENT
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        headers.update(self.GITHUB_HEADERS)
+        response = self.client.post("/prcomment", headers=headers, data=payload)
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+
+        mock_request.assert_not_called()
+        mock_check_dependecy.assert_not_called()
+
+    @patch('server.check_dependency')
+    @patch('server.requests.request')
+    def test_checks_pull_request_dependency_if_comment_event_has_keywords(self, mock_request, mock_check_dependency):
+        payload = PR_COMMENT_EVENT
+        payload = payload.replace("COMMENT_BODY", "Depends on #2")
         headers = {
             "Content-Type": "application/json"
         }
@@ -66,6 +83,7 @@ class ServerTest(TestCase):
         }
 
         mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
+        mock_check_dependency.assert_called_once_with("2")
 
     @patch('server.requests.request')
     def test_set_status_as_error(self, mock_request):
@@ -146,29 +164,6 @@ class ServerTest(TestCase):
         }
 
         mock_request.assert_called_once_with('POST', url, data=json.dumps(expected_data))
-
-    @patch('server.check_dependency')
-    @patch('server.requests.request')
-    def test_checks_pull_request_dependency_if_comment_event_has_keywords(self, mock_request, mock_check_dependency):
-        payload = PR_COMMENT_EVENT
-        payload = payload.replace("COMMENT_BODY", "Depends on #2")
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        headers.update(self.GITHUB_HEADERS)
-        response = self.client.post("/prcomment", headers=headers, data=payload)
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
-
-        expected_data = {
-            "state": "pending",
-            "target_url": "foo",
-            "description": "Checking dependencies...",
-            "context": "continuous-integration/merge-watcher"
-        }
-
-        mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
-        mock_check_dependency.assert_called_once_with("2")
 
 
 if __name__ == '__main__':
