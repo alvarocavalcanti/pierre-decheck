@@ -1,1 +1,1 @@
-gunicorn -b 0.0.0.0 wsgi:app
+web: gunicorn -b 0.0.0.0:$PORT wsgi:app
