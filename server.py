@@ -12,6 +12,7 @@ STATUS_PENDING = 'pending'
 STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
 KEYWORDS_DEPENDS_ON = "depends on"
+CONTEXT = "continuous-integration/merge-watcher"
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -81,7 +82,7 @@ def set_status(owner, repo, sha, commit_status, description=None):
 
 
 def check_dependency(dependency_id, owner, repo):
-    url = "{}/repos/{}/{}/issues/{}".format(
+    url = "{}repos/{}/{}/issues/{}".format(
         BASE_GITHUB_URL,
         owner,
         repo,
@@ -94,6 +95,31 @@ def check_dependency(dependency_id, owner, repo):
         return json.loads(response.text).get('state', None)
 
     return None
+
+
+def update_commit_status(owner, repo, sha, dependency_state):
+    if dependency_state == "open":
+        state = "failure"
+    elif dependency_state == "closed":
+        state = "success"
+    else:
+        state = "pending"
+
+    url = "{}repos/{}/{}/statuses/{}".format(
+        BASE_GITHUB_URL,
+        owner,
+        repo,
+        sha
+    )
+
+    data = {
+        "state": state,
+        "target_url": None,
+        "description": "Dependencies are still open.",
+        "context": CONTEXT
+    }
+
+    requests.request('POST', url, data=json.dumps(data))
 
 
 if __name__ == "__main__":
