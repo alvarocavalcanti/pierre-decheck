@@ -260,6 +260,39 @@ class ServerTest(TestCase):
         }
         mock_request.assert_called_once_with('POST', expected_url, data=json.dumps(expected_data))
 
+    @patch('server.update_commit_status')
+    @patch('server.check_dependency')
+    @patch('server.requests.request')
+    def test_update_commit_status_when_pr_comment_is_accepted(self,
+                                                              mock_request,
+                                                              mock_check_dependency,
+                                                              mock_update_commit_status
+                                                              ):
+        mock_check_dependency.return_value = "open"
+
+        payload = PR_COMMENT_EVENT
+        payload = payload.replace("COMMENT_BODY", "Depends on #2")
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        headers.update(self.GITHUB_HEADERS)
+        response = self.client.post("/prcomment", headers=headers, data=payload)
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+
+        expected_data = {
+            "state": "pending",
+            "target_url": "foo",
+            "description": "Checking dependencies...",
+            "context": "continuous-integration/merge-watcher"
+        }
+
+        mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
+        mock_check_dependency.assert_called_once_with("2", "baxterthehacker", "public-repo")
+        mock_update_commit_status.assert_called_once_with(
+            "baxterthehacker", "public-repo", "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c", "open"
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

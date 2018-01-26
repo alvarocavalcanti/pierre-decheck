@@ -29,7 +29,9 @@ def pull_request_comment():
     if dependency_id:
         owner, repo, sha = _extract_comment_info()
         set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
-        check_dependency(dependency_id, owner, repo)
+        dependency_state = check_dependency(dependency_id, owner, repo)
+        if dependency_state:
+            update_commit_status(owner, repo, sha, dependency_state)
 
     return {}, status.HTTP_201_CREATED
 
