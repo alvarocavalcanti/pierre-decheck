@@ -1,12 +1,13 @@
 import json
 import unittest
+from collections import namedtuple
 from unittest.mock import patch, ANY
 
 from flask_api import status
 from flask_testing import TestCase
 
 import server
-from payloads import PR_COMMENT_EVENT
+from payloads import PR_COMMENT_EVENT, ISSUE_RESPONSE_OPEN
 
 
 class ServerTest(TestCase):
@@ -164,6 +165,28 @@ class ServerTest(TestCase):
         }
 
         mock_request.assert_called_once_with('POST', url, data=json.dumps(expected_data))
+
+    @patch('server.requests.request')
+    def test_checks_dependency_properly(self, mock_request):
+        server.check_dependency("1", "foo-owner", "foo-repo")
+
+        expected_url = "{}/repos/{}/{}/issues/{}".format(
+            server.BASE_GITHUB_URL,
+            "foo-owner",
+            "foo-repo",
+            "1"
+        )
+
+        mock_request.assert_called_once_with('GET', expected_url)
+
+    @patch('server.requests.request')
+    def test_returns_dependency_status(self, mock_request):
+        Response = namedtuple('Response', ['status_code', 'text'])
+        mock_request.return_value = Response(status_code=status.HTTP_200_OK, text=ISSUE_RESPONSE_OPEN)
+
+        issue_state = server.check_dependency("1", "foo-owner", "foo-repo")
+
+        self.assertEqual("open", issue_state)
 
 
 if __name__ == '__main__':
