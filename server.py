@@ -80,8 +80,20 @@ def set_status(owner, repo, sha, commit_status, description=None):
     requests.request('POST', url, data=json.dumps(payload))
 
 
-def check_dependency(dependency_id):
-    pass
+def check_dependency(dependency_id, owner, repo):
+    url = "{}/repos/{}/{}/issues/{}".format(
+        BASE_GITHUB_URL,
+        owner,
+        repo,
+        dependency_id
+    )
+
+    response = requests.request('GET', url)
+
+    if response.status_code == status.HTTP_200_OK:
+        return json.loads(response.text).get('state', None)
+
+    return None
 
 
 if __name__ == "__main__":
