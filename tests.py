@@ -170,7 +170,7 @@ class ServerTest(TestCase):
     def test_checks_dependency_properly(self, mock_request):
         server.check_dependency("1", "foo-owner", "foo-repo")
 
-        expected_url = "{}/repos/{}/{}/issues/{}".format(
+        expected_url = "{}repos/{}/{}/issues/{}".format(
             server.BASE_GITHUB_URL,
             "foo-owner",
             "foo-repo",
@@ -187,6 +187,78 @@ class ServerTest(TestCase):
         issue_state = server.check_dependency("1", "foo-owner", "foo-repo")
 
         self.assertEqual("open", issue_state)
+
+    @patch('server.requests.request')
+    def test_set_original_commit_status_as_failure_when_dependency_state_is_open(self, mock_request):
+        dependency_state = "open"
+        owner = "foo-owner"
+        repo = "foo-repo"
+        sha = "12309f"
+
+        server.update_commit_status(owner, repo, sha, dependency_state)
+
+        expected_url = "{}repos/{}/{}/statuses/{}".format(
+            server.BASE_GITHUB_URL,
+            owner,
+            repo,
+            sha
+        )
+
+        expected_data = {
+            "state": "failure",
+            "target_url": None,
+            "description": "Dependencies are still open.",
+            "context": server.CONTEXT
+        }
+        mock_request.assert_called_once_with('POST', expected_url, data=json.dumps(expected_data))
+
+    @patch('server.requests.request')
+    def test_set_original_commit_status_as_success_when_dependency_state_is_closed(self, mock_request):
+        dependency_state = "closed"
+        owner = "foo-owner"
+        repo = "foo-repo"
+        sha = "12309f"
+
+        server.update_commit_status(owner, repo, sha, dependency_state)
+
+        expected_url = "{}repos/{}/{}/statuses/{}".format(
+            server.BASE_GITHUB_URL,
+            owner,
+            repo,
+            sha
+        )
+
+        expected_data = {
+            "state": "success",
+            "target_url": None,
+            "description": "Dependencies are still open.",
+            "context": server.CONTEXT
+        }
+        mock_request.assert_called_once_with('POST', expected_url, data=json.dumps(expected_data))
+
+    @patch('server.requests.request')
+    def test_set_original_commit_status_as_pending_when_dependency_state_is_unknown(self, mock_request):
+        dependency_state = None
+        owner = "foo-owner"
+        repo = "foo-repo"
+        sha = "12309f"
+
+        server.update_commit_status(owner, repo, sha, dependency_state)
+
+        expected_url = "{}repos/{}/{}/statuses/{}".format(
+            server.BASE_GITHUB_URL,
+            owner,
+            repo,
+            sha
+        )
+
+        expected_data = {
+            "state": "pending",
+            "target_url": None,
+            "description": "Dependencies are still open.",
+            "context": server.CONTEXT
+        }
+        mock_request.assert_called_once_with('POST', expected_url, data=json.dumps(expected_data))
 
 
 if __name__ == '__main__':
