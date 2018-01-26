@@ -28,7 +28,7 @@ def pull_request_comment():
     if dependency_id:
         owner, repo, sha = _extract_comment_info()
         set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
-        check_dependency(dependency_id)
+        check_dependency(dependency_id, owner, repo)
 
     return {}, status.HTTP_201_CREATED
 
@@ -44,8 +44,8 @@ def _get_dependency_id_if_comment_has_keywords(keywords):
 
 
 def _extract_comment_info():
-    owner = request.data.get('pull_request', {}).get('repo', {}).get('owner', {}).get('login', '')
-    repo = request.data.get('pull_request', {}).get('repo', {}).get('name', '')
+    owner = request.data.get('pull_request', {}).get('head', {}).get('repo', {}).get('owner', {}).get('login', '')
+    repo = request.data.get('pull_request', {}).get('head', {}).get('repo', {}).get('name', '')
     sha = request.data.get('comment', {}).get('commit_id', '')
     return owner, repo, sha
 

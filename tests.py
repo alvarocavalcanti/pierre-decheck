@@ -83,7 +83,7 @@ class ServerTest(TestCase):
         }
 
         mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
-        mock_check_dependency.assert_called_once_with("2")
+        mock_check_dependency.assert_called_once_with("2", "baxterthehacker", "public-repo")
 
     @patch('server.requests.request')
     def test_set_status_as_error(self, mock_request):
