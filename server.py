@@ -17,7 +17,7 @@ CONTEXT = "continuous-integration/merge-watcher"
 
 @app.route("/", methods=['GET', 'POST'])
 def root_list():
-    return []
+    return "merge-watcher: nothing to see here.", status.HTTP_200_OK
 
 
 @app.route("/prcomment", methods=['POST'])
