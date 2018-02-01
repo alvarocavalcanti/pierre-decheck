@@ -12,5 +12,4 @@ setup: activate-env
 test: setup
 	python -u tests.py
 deploy:
-	heroku login
 	git push heroku master
