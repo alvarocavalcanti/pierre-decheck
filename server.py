@@ -13,6 +13,9 @@ STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
 KEYWORDS_DEPENDS_ON = "depends on"
 CONTEXT = "continuous-integration/merge-watcher"
+DESCRIPTION_PENDING = "Checking dependencies..."
+DESCRIPTION_OPEN = "Dependencies are still open."
+DESCRIPTION_CLOSED = "Dependencies are satisfied."
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -28,7 +31,7 @@ def pull_request_comment():
     dependency_id = _get_dependency_id_if_comment_has_keywords(KEYWORDS_DEPENDS_ON)
     if dependency_id:
         owner, repo, sha = _extract_comment_info()
-        set_status(owner, repo, sha, STATUS_PENDING, "Checking dependencies...")
+        set_status(owner, repo, sha, STATUS_PENDING, DESCRIPTION_PENDING)
         dependency_state = check_dependency(dependency_id, owner, repo)
         if dependency_state:
             update_commit_status(owner, repo, sha, dependency_state)
@@ -102,10 +105,13 @@ def check_dependency(dependency_id, owner, repo):
 def update_commit_status(owner, repo, sha, dependency_state):
     if dependency_state == "open":
         state = "failure"
+        description = DESCRIPTION_OPEN
     elif dependency_state == "closed":
         state = "success"
+        description = DESCRIPTION_CLOSED
     else:
         state = "pending"
+        description = DESCRIPTION_PENDING
 
     url = "{}repos/{}/{}/statuses/{}".format(
         BASE_GITHUB_URL,
@@ -116,8 +122,8 @@ def update_commit_status(owner, repo, sha, dependency_state):
 
     data = {
         "state": state,
-        "target_url": None,
-        "description": "Dependencies are still open.",
+        "target_url": "foo",
+        "description": description,
         "context": CONTEXT
     }
 
