@@ -6,11 +6,5 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Create Virtualenv
-          command: make create-env
-      - run:
-          name: Activate Virtualenv
-          command: make activate-env
-      - run:
           name: Tests
-          command: make test
+          command: python -u tests.py
