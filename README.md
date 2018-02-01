@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
 # Pierre DeCheck
-Checks the dependencies of Pull Requests.
+Pull Request Dependency Check
 
 ## Road Map
 [Roadmap](Roadmap.md)
