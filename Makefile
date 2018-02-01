@@ -11,3 +11,6 @@ setup: activate-env
 	pip install -r requirements.txt
 test: setup
 	python -u tests.py
+deploy:
+	heroku login
+	git push heroku master
