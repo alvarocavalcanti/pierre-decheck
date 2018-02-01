@@ -1,5 +1,8 @@
-# mergewatcher
-Watches over any given Github Pull Request for its dependencies on other Pull Requests
+# Pierre DeCheck
+Checks the dependencies of Pull Requests.
+
+## Road Map
+[Roadmap](Roadmap.md)
 
 ## References
 
