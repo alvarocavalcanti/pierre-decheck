@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:stretch
+    steps:
+      - checkout
+      - run:
+          name: Create Virtualenv
+          command: make create-env
+      - run:
+          name: Activate Virtualenv
+          command: make activate-env
+      - run:
+          name: Tests
+          command: make test
