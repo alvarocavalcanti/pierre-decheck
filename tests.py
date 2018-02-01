@@ -65,7 +65,10 @@ class ServerTest(TestCase):
 
     @patch('server.check_dependency')
     @patch('server.requests.request')
-    def test_checks_pull_request_dependency_if_comment_event_has_keywords(self, mock_request, mock_check_dependency):
+    def test_checks_pull_request_dependency_if_comment_event_has_keywords_and_updates_commit_status(
+            self, mock_request, mock_check_dependency
+    ):
+        mock_check_dependency.return_value = "closed"
         payload = PR_COMMENT_EVENT
         payload = payload.replace("COMMENT_BODY", "Depends on #2")
         headers = {
@@ -83,7 +86,16 @@ class ServerTest(TestCase):
             "context": "continuous-integration/merge-watcher"
         }
 
-        mock_request.assert_called_once_with('POST', ANY, data=json.dumps(expected_data))
+        mock_request.assert_any_call('POST', ANY, data=json.dumps(expected_data))
+
+        expected_data.update({
+            "state": "success",
+            "description": "Dependencies are satisfied."
+        })
+
+        print("CALLS: {}".format(mock_request.call_args_list))
+        mock_request.assert_any_call('POST', ANY, data=json.dumps(expected_data))
+
         mock_check_dependency.assert_called_once_with("2", "baxterthehacker", "public-repo")
 
     @patch('server.requests.request')
@@ -206,7 +218,7 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "failure",
-            "target_url": None,
+            "target_url": "foo",
             "description": "Dependencies are still open.",
             "context": server.CONTEXT
         }
@@ -230,8 +242,8 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "success",
-            "target_url": None,
-            "description": "Dependencies are still open.",
+            "target_url": "foo",
+            "description": "Dependencies are satisfied.",
             "context": server.CONTEXT
         }
         mock_request.assert_called_once_with('POST', expected_url, data=json.dumps(expected_data))
@@ -254,8 +266,8 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "pending",
-            "target_url": None,
-            "description": "Dependencies are still open.",
+            "target_url": "foo",
+            "description": "Checking dependencies...",
             "context": server.CONTEXT
         }
         mock_request.assert_called_once_with('POST', expected_url, data=json.dumps(expected_data))
