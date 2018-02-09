@@ -55,8 +55,8 @@ def _get_dependency_id_if_comment_has_keywords(keywords):
 
 
 def _extract_comment_info():
-    owner = request.data.get('pull_request', {}).get('head', {}).get('repo', {}).get('owner', {}).get('login', '')
-    repo = request.data.get('pull_request', {}).get('head', {}).get('repo', {}).get('name', '')
+    owner = request.data.get('repository', {}).get('owner', {}).get('login', '')
+    repo = request.data.get('repository', {}).get('name', '')
     sha = request.data.get('comment', {}).get('commit_id', '')
     return owner, repo, sha
 
@@ -69,7 +69,7 @@ def _does_not_have_github_headers():
 def _extract_github_headers():
     has_github_event = request.headers.get('X-GitHub-Event', '') == 'issue_comment'
     has_github_delivery = True if request.headers.get('X-GitHub-Delivery', '') else False
-    has_github_user_agent = request.headers.get('User-Agent', '').startswith('GitHub-Hookshot')
+    has_github_user_agent = request.headers.get('User-Agent', '').startswith('GitHub-')
     return has_github_delivery, has_github_event, has_github_user_agent
 
 
