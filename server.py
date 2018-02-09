@@ -31,10 +31,13 @@ def pull_request_comment():
         return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
 
     dependency_id = _get_dependency_id_if_comment_has_keywords(KEYWORDS_DEPENDS_ON)
+    print("Comment has keywords? {}".format(dependency_id))
     if dependency_id:
         owner, repo, sha = _extract_comment_info()
+        print("Comment Info: owner {}, repo {}, sha {}".format(owner, repo, sha))
         set_status(owner, repo, sha, STATUS_PENDING, DESCRIPTION_PENDING)
         dependency_state = check_dependency(dependency_id, owner, repo)
+        print("Dependency State: {}".format(dependency_state))
         if dependency_state:
             update_commit_status(owner, repo, sha, dependency_state)
 
