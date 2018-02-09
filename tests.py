@@ -14,9 +14,9 @@ class ServerTest(TestCase):
     render_templates = False
 
     GITHUB_HEADERS = {
-        "X-GitHub-Event": "comments",
+        "X-GitHub-Event": "issue_comment",
         "X-GitHub-Delivery": "foo",
-        "X-Hub-Signature": "sha1=foobar"
+        "User-Agent": "GitHub-Foo"
     }
 
     def create_app(self):
@@ -58,7 +58,7 @@ class ServerTest(TestCase):
 
         headers.update(self.GITHUB_HEADERS)
         response = self.client.post("/prcomment", headers=headers, data=payload)
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         mock_request.assert_not_called()
         mock_check_dependecy.assert_not_called()
