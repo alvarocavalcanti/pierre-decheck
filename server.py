@@ -25,7 +25,9 @@ def root_list():
 
 @app.route("/prcomment", methods=['POST'])
 def pull_request_comment():
+    print("Received request with data: {}".format(request.data))
     if _does_not_have_github_headers():
+        print("Could not find GitHub headers")
         return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
 
     dependency_id = _get_dependency_id_if_comment_has_keywords(KEYWORDS_DEPENDS_ON)
