@@ -26,9 +26,9 @@ def root_list():
 @app.route("/prcomment", methods=['POST'])
 def pull_request_comment():
     print("Received request with headers \n{} \n and data: \n{}".format(request.headers, request.data))
-    # if _does_not_have_github_headers():
-    #     print("Could not find GitHub headers")
-    #     return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
+    if _does_not_have_github_headers():
+        print("Could not find GitHub headers")
+        return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
 
     dependency_id = _get_dependency_id_if_comment_has_keywords(KEYWORDS_DEPENDS_ON)
     print("Comment has keywords? {}".format(dependency_id))
@@ -62,15 +62,15 @@ def _extract_comment_info():
 
 
 def _does_not_have_github_headers():
-    has_github_delivery, has_github_event, has_hub_signature = _extract_github_headers()
-    return not (has_github_delivery and has_github_event and has_hub_signature)
+    has_github_delivery, has_github_event, has_github_user_agent = _extract_github_headers()
+    return not (has_github_delivery and has_github_event and has_github_user_agent)
 
 
 def _extract_github_headers():
-    has_github_event = request.headers.get('X-GitHub-Event', '') == 'comments'
+    has_github_event = request.headers.get('X-GitHub-Event', '') == 'issue_comment'
     has_github_delivery = True if request.headers.get('X-GitHub-Delivery', '') else False
-    has_hub_signature = request.headers.get('X-Hub-Signature', '').startswith('sha1=')
-    return has_github_delivery, has_github_event, has_hub_signature
+    has_github_user_agent = request.headers.get('User-Agent', '').startswith('GitHub-Hookshot')
+    return has_github_delivery, has_github_event, has_github_user_agent
 
 
 def set_status(owner, repo, sha, commit_status, description=None):
