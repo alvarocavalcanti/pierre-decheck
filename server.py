@@ -25,6 +25,7 @@ def root_list():
 
 @app.route("/prcomment", methods=['POST'])
 def pull_request_comment():
+    print("Received request with headers {} data: {}".format(request.headers))
     print("Received request with data: {}".format(request.data))
     # if _does_not_have_github_headers():
     #     print("Could not find GitHub headers")
