@@ -25,8 +25,7 @@ def root_list():
 
 @app.route("/prcomment", methods=['POST'])
 def pull_request_comment():
-    print("Received request with headers {} data: {}".format(request.headers))
-    print("Received request with data: {}".format(request.data))
+    print("Received request with headers \n{} \n and data: \n{}".format(request.headers, request.data))
     # if _does_not_have_github_headers():
     #     print("Could not find GitHub headers")
     #     return {"message": "Could not find GitHub headers"}, status.HTTP_400_BAD_REQUEST
