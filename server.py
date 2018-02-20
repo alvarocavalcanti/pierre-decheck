@@ -25,6 +25,8 @@ def root_list():
 def webhook_event():
     print("Received request with headers \n{} \n and data: \n{}".format(request.headers, request.data))
 
+    return {}, status.HTTP_201_CREATED
+
 
 if __name__ == "__main__":
     app.run(debug=True)
