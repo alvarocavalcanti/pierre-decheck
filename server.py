@@ -1,3 +1,5 @@
+import json
+
 from flask import request
 
 from flask_api import FlaskAPI, status
@@ -26,6 +28,21 @@ def webhook_event():
     print("Received request with headers \n{} \n and data: \n{}".format(request.headers, request.data))
 
     return {}, status.HTTP_201_CREATED
+
+
+def get_bodies(event_object):
+    bodies = []
+    for key, value in event_object.items():
+        if isinstance(value, dict):
+            bodies.extend(get_bodies(value))
+        elif key == "body":
+            bodies.append(value)
+
+    return bodies
+
+
+def get_dependencies_from_bodies(bodies):
+    return None
 
 
 if __name__ == "__main__":
