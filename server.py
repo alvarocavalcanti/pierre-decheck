@@ -7,16 +7,11 @@ from flask_api import FlaskAPI, status
 
 app = FlaskAPI(__name__)
 
-STATUS_ERROR = 'error'
 STATUS_FAILURE = 'failure'
-STATUS_PENDING = 'pending'
 STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
 KEYWORDS_DEPENDS_ON = "depends on"
-CONTEXT = "continuous-integration/merge-watcher"
-DESCRIPTION_PENDING = "Checking dependencies..."
-DESCRIPTION_OPEN = "Dependencies are still open."
-DESCRIPTION_CLOSED = "Dependencies are satisfied."
+CONTEXT = "continuous-integration/pierre-decheck"
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -34,6 +29,17 @@ def webhook_event():
     for dep in dependencies:
         state = get_dependency_state(dependency_id=dep, owner=owner, repo=repo)
         dependencies_and_states.append((dep, state))
+
+    if dependencies_and_states and len(dependencies_and_states) > 0:
+        sha = request.data.get("pull_request").get("head").get("sha")
+        are_dependencies_met = True
+        for dep, state in dependencies_and_states:
+            if state == "open":
+                are_dependencies_met = False
+
+        update_commit_status(
+            owner=owner, repo=repo, sha=sha, dependencies=dependencies, are_dependencies_met=are_dependencies_met
+        )
 
     return {}, status.HTTP_201_CREATED
 
@@ -86,6 +92,27 @@ def get_dependency_state(dependency_id, owner, repo):
     if response.status_code == status.HTTP_200_OK:
         return json.loads(response.text).get('state', None)
     return None
+
+
+def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=False):
+    state = STATUS_SUCCESS if are_dependencies_met else STATUS_FAILURE
+    description = "Dependencies #: {}".format(', '.join(dependencies))
+
+    url = "{}repos/{}/{}/statuses/{}".format(
+        BASE_GITHUB_URL,
+        owner,
+        repo,
+        sha
+    )
+
+    data = {
+        "state": state,
+        "target_url": "foo",
+        "description": description,
+        "context": CONTEXT
+    }
+
+    requests.request('POST', url, data=json.dumps(data))
 
 
 if __name__ == "__main__":

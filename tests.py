@@ -75,6 +75,36 @@ class ServerTest(TestCase):
 
         requests_mock.assert_any_call('GET', expected_url)
 
+    @patch('server.get_dependency_state')
+    @patch('server.requests.request')
+    def test_updates_issue_status_based_on_pr_created_event_dependencies(self, requests_mock, dependency_state_mock):
+        dependency_state_mock.return_value = ['closed']
+
+        payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2.")
+
+        sha = json.loads(payload).get("pull_request").get("head").get("sha")
+
+        response = self.client.post(
+            "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'
+        )
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        expected_url = "{}repos/{}/{}/statuses/{}".format(
+            server.BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            sha
+        )
+
+        expected_data = {
+            "state": "success",
+            "target_url": "foo",
+            "description": "Dependencies #: 2",
+            "context": server.CONTEXT
+        }
+
+        requests_mock.assert_any_call('POST', expected_url, data=json.dumps(expected_data))
+
     @patch('server.requests.request')
     def failing_test_checks_dependencies_upon_receiving_pr_created_event_for_more_than_one_dependency(
             self, requests_mock
