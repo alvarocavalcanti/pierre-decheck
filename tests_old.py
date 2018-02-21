@@ -7,7 +7,7 @@ from flask_api import status
 from flask_testing import TestCase
 
 import server_old as server
-from payloads import PR_COMMENT_EVENT, ISSUE_RESPONSE_OPEN
+from payloads import PR_COMMENT_EVENT
 
 
 class ServerTest(TestCase):
@@ -190,15 +190,6 @@ class ServerTest(TestCase):
         )
 
         mock_request.assert_called_once_with('GET', expected_url)
-
-    @patch('server.requests.request')
-    def test_returns_dependency_status(self, mock_request):
-        Response = namedtuple('Response', ['status_code', 'text'])
-        mock_request.return_value = Response(status_code=status.HTTP_200_OK, text=ISSUE_RESPONSE_OPEN)
-
-        issue_state = server.check_dependency("1", "foo-owner", "foo-repo")
-
-        self.assertEqual("open", issue_state)
 
     @patch('server.requests.request')
     def test_set_original_commit_status_as_failure_when_dependency_state_is_open(self, mock_request):

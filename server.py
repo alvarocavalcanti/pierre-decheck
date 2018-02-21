@@ -1,5 +1,6 @@
 import json
 
+import requests
 from flask import request
 
 from flask_api import FlaskAPI, status
@@ -42,17 +43,30 @@ def get_bodies(event_object):
 
 
 def get_dependencies_from_bodies(bodies):
-    dependencies = [_get_dependency_ids(body) for body in bodies]
+    dependencies = [extract_dependency_id(body) for body in bodies]
     return [dep for dep in dependencies if dep]
 
 
-def _get_dependency_ids(comment_body):
+def extract_dependency_id(comment_body):
     import re
     comment_body = comment_body.lower()
     regex = r"(?:{}).(?:\#)(\d*)".format("depends on")
     match = re.search(regex, comment_body)
     if match:
         return match.group(1)
+
+
+def get_dependency_state(dependency_id, owner, repo):
+    url = "{}repos/{}/{}/issues/{}".format(
+        BASE_GITHUB_URL,
+        owner,
+        repo,
+        dependency_id
+    )
+    response = requests.request('GET', url)
+    if response.status_code == status.HTTP_200_OK:
+        return json.loads(response.text).get('state', None)
+    return None
 
 
 if __name__ == "__main__":
