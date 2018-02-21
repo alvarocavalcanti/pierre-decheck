@@ -1,5 +1,7 @@
 import json
+from unittest.mock import patch, ANY
 
+from flask_api import status
 from flask_testing import TestCase
 
 import server
@@ -45,3 +47,32 @@ class ServerTest(TestCase):
         self.assertEqual(2, len(dependencies))
         self.assertEqual("2", dependencies[0])
         self.assertEqual("3", dependencies[1])
+
+    @patch('server.requests.request')
+    def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
+        payload = PR_CREATED
+        payload.replace("This is the PR body", "This is the PR body. Depends on #2.")
+
+        response = self.client.post("/webhook", headers=self.GITHUB_HEADERS, data=payload)
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        expected_url = "{}repos/{}/{}/issues/{}".format(
+            server.BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "2"
+        )
+
+        requests_mock.assert_any_call('GET', expected_url, ANY)
+
+    def test_get_owner_and_repo_from_pr_created_event(self):
+        owner, repo = server.get_owner_and_repo(json.loads(PR_CREATED))
+
+        self.assertEqual("alvarocavalcanti", owner)
+        self.assertEqual("pierre-decheck", repo)
+
+    def test_get_owner_and_repo_from_pr_comment_event(self):
+        owner, repo = server.get_owner_and_repo(json.loads(PR_COMMENT_EVENT))
+
+        self.assertEqual("alvarocavalcanti", owner)
+        self.assertEqual("pierre-decheck", repo)
