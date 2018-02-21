@@ -47,6 +47,13 @@ def get_dependencies_from_bodies(bodies):
     return [dep for dep in dependencies if dep]
 
 
+def get_owner_and_repo(event):
+    repo = event.get("repository", {}).get("name", "")
+    owner = event.get("repository", {}).get("owner", {}).get("login", "")
+
+    return owner, repo
+
+
 def extract_dependency_id(comment_body):
     import re
     comment_body = comment_body.lower()
