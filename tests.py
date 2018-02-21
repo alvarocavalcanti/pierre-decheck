@@ -66,6 +66,63 @@ class ServerTest(TestCase):
 
         requests_mock.assert_any_call('GET', expected_url)
 
+    @patch('server.requests.request')
+    def failing_test_checks_dependencies_upon_receiving_pr_created_event_for_more_than_one_dependency(
+            self, requests_mock
+    ):
+        payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2. Depends on #3.")
+
+        response = self.client.post(
+            "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'
+        )
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        expected_url_dep_2 = "{}repos/{}/{}/issues/{}".format(
+            server.BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "2"
+        )
+
+        expected_url_dep_3 = "{}repos/{}/{}/issues/{}".format(
+            server.BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "3"
+        )
+
+        requests_mock.assert_any_call('GET', expected_url_dep_2)
+        requests_mock.assert_any_call('GET', expected_url_dep_3)
+
+    @patch('server.requests.request')
+    def test_checks_dependencies_upon_receiving_pr_comment_event_for_more_than_one_dependency(
+            self, requests_mock
+    ):
+        payload = PR_COMMENT_EVENT.replace("This is the PR body", "Depends on #2.")
+        payload = payload.replace("this is a comment", "Depends on #3.")
+
+        response = self.client.post(
+            "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'
+        )
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        expected_url_dep_2 = "{}repos/{}/{}/issues/{}".format(
+            server.BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "2"
+        )
+
+        expected_url_dep_3 = "{}repos/{}/{}/issues/{}".format(
+            server.BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "3"
+        )
+
+        requests_mock.assert_any_call('GET', expected_url_dep_2)
+        requests_mock.assert_any_call('GET', expected_url_dep_3)
+
     def test_get_owner_and_repo_from_pr_created_event(self):
         owner, repo = server.get_owner_and_repo(json.loads(PR_CREATED))
 
