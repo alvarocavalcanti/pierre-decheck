@@ -50,7 +50,12 @@ def get_bodies(event_object):
 
 
 def get_dependencies_from_bodies(bodies):
-    dependencies = [extract_dependency_id(body) for body in bodies]
+    dependencies = []
+    for body in bodies:
+        deps = extract_dependency_id(body)
+        if deps:
+            dependencies.extend(deps)
+
     return [dep for dep in dependencies if dep]
 
 
@@ -65,9 +70,9 @@ def extract_dependency_id(comment_body):
     import re
     comment_body = comment_body.lower()
     regex = r"(?:{}).(?:\#)(\d*)".format("depends on")
-    match = re.search(regex, comment_body)
+    match = re.findall(regex, comment_body)
     if match:
-        return match.group(1)
+        return match
 
 
 def get_dependency_state(dependency_id, owner, repo):

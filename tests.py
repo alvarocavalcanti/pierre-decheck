@@ -48,6 +48,15 @@ class ServerTest(TestCase):
         self.assertEqual("2", dependencies[0])
         self.assertEqual("3", dependencies[1])
 
+    def test_get_dependencies_identifiers_from_single_body(self):
+        bodies = ["Depends on #2. Depends on #3"]
+
+        dependencies = server.get_dependencies_from_bodies(bodies)
+
+        self.assertEqual(2, len(dependencies))
+        self.assertEqual("2", dependencies[0])
+        self.assertEqual("3", dependencies[1])
+
     @patch('server.requests.request')
     def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
         payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2.")
