@@ -1,5 +1,5 @@
 import json
-from unittest.mock import patch, ANY
+from unittest.mock import patch
 
 from flask_api import status
 from flask_testing import TestCase
@@ -50,10 +50,11 @@ class ServerTest(TestCase):
 
     @patch('server.requests.request')
     def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
-        payload = PR_CREATED
-        payload.replace("This is the PR body", "This is the PR body. Depends on #2.")
+        payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2.")
 
-        response = self.client.post("/webhook", headers=self.GITHUB_HEADERS, data=payload)
+        response = self.client.post(
+            "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'
+        )
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url = "{}repos/{}/{}/issues/{}".format(
@@ -63,7 +64,7 @@ class ServerTest(TestCase):
             "2"
         )
 
-        requests_mock.assert_any_call('GET', expected_url, ANY)
+        requests_mock.assert_any_call('GET', expected_url)
 
     def test_get_owner_and_repo_from_pr_created_event(self):
         owner, repo = server.get_owner_and_repo(json.loads(PR_CREATED))

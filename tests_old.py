@@ -1,6 +1,5 @@
 import json
 import unittest
-from collections import namedtuple
 from unittest.mock import patch, ANY
 
 from flask_api import status

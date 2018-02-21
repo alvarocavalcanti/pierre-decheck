@@ -26,7 +26,15 @@ def root_list():
 
 @app.route("/webhook", methods=['POST'])
 def webhook_event():
-    print("Received request with headers \n{} \n and data: \n{}".format(request.headers, request.data))
+    print("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
+
+    owner, repo = get_owner_and_repo(request.data)
+    bodies = get_bodies(request.data)
+    dependencies = get_dependencies_from_bodies(bodies)
+    dependencies_and_states = []
+    for dep in dependencies:
+        state = get_dependency_state(dependency_id=dep, owner=owner, repo=repo)
+        dependencies_and_states.append((dep, state))
 
     return {}, status.HTTP_201_CREATED
 
