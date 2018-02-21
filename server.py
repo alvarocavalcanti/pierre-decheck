@@ -42,7 +42,17 @@ def get_bodies(event_object):
 
 
 def get_dependencies_from_bodies(bodies):
-    return None
+    dependencies = [_get_dependency_ids(body) for body in bodies]
+    return [dep for dep in dependencies if dep]
+
+
+def _get_dependency_ids(comment_body):
+    import re
+    comment_body = comment_body.lower()
+    regex = r"(?:{}).(?:\#)(\d*)".format("depends on")
+    match = re.search(regex, comment_body)
+    if match:
+        return match.group(1)
 
 
 if __name__ == "__main__":
