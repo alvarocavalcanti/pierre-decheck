@@ -11,7 +11,7 @@ app = FlaskAPI(__name__)
 STATUS_FAILURE = 'failure'
 STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
-TARGET_URL = "https://infinite-harbor-38537.herokuapp.com"
+TARGET_URL = "https://infinite-harbor-38537.herokuapp.com/details?info={}"
 KEYWORDS_DEPENDS_ON = "depends on"
 CONTEXT = "ci/pierre-decheck"
 
@@ -54,6 +54,15 @@ def webhook_event():
         )
 
     return {}, status.HTTP_201_CREATED
+
+
+@app.route("/details", methods=['GET'])
+def details():
+    info = request.args.get('info')
+    dependencies_and_states = info.split('-')
+    dependencies_info = [dep.replace(':', ' is ') for dep in dependencies_and_states]
+
+    return dependencies_info, status.HTTP_200_OK
 
 
 def get_all_bodies(data):
@@ -148,6 +157,7 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
     state = STATUS_SUCCESS if are_dependencies_met else STATUS_FAILURE
     description = "All dependencies are met: {}" if are_dependencies_met else "Not all dependencies are met: {}"
     description = description.format(', '.join('({}: {})'.format(*dep) for dep in dependencies))
+    target_url = TARGET_URL.format('-'.join('{}:{}'.format(*dep) for dep in dependencies))
 
     url = "{}repos/{}/{}/statuses/{}".format(
         BASE_GITHUB_URL,
@@ -160,7 +170,7 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
 
     data = {
         "state": state,
-        "target_url": TARGET_URL,
+        "target_url": target_url,
         "description": description,
         "context": CONTEXT
     }
