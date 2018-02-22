@@ -33,7 +33,7 @@ def webhook_event():
     print("Owner: {}, Repo: {}. Dependencies: {}".format(
         owner,
         repo,
-        ', '.join(dependencies_and_states)
+        dependencies_and_states
     ))
 
     if dependencies_and_states and len(dependencies_and_states) > 0:
