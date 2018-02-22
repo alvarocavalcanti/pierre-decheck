@@ -131,7 +131,7 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
         "context": CONTEXT
     }
 
-    print("Update commit status: {}".format(data))
+    print("Update commit status: URL: {} \n Data: {}".format(data))
 
     requests.request('POST', url, data=json.dumps(data))
 
