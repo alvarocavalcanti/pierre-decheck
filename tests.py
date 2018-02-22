@@ -104,7 +104,7 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "success",
-            "target_url": server.TARGET_URL,
+            "target_url": server.TARGET_URL.format('2:closed'),
             "description": "All dependencies are met: (2: closed)",
             "context": server.CONTEXT
         }
