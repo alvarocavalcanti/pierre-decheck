@@ -13,7 +13,7 @@ STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
 TARGET_URL = "https://infinite-harbor-38537.herokuapp.com"
 KEYWORDS_DEPENDS_ON = "depends on"
-CONTEXT = "continuous-integration/pierre-decheck"
+CONTEXT = "ci/pierre-decheck"
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -117,7 +117,7 @@ def get_dependency_state(dependency_id, owner, repo):
 
 def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=False):
     state = STATUS_SUCCESS if are_dependencies_met else STATUS_FAILURE
-    description = "Dependencies #: {}".format(', '.join(dependencies))
+    description = "Dependencies: {}".format(', '.join(dependencies))
 
     url = "{}repos/{}/{}/statuses/{}".format(
         BASE_GITHUB_URL,
