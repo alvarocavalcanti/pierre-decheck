@@ -61,7 +61,7 @@ def get_sha(data):
     response = requests.request('GET', commits_url)
     if response.status_code == status.HTTP_200_OK:
         commits = json.loads(response.text)
-        return commits[-1].get("sha", None)
+        return commits[0].get("sha", None)
     return None
 
 
