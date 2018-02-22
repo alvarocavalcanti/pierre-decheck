@@ -117,7 +117,8 @@ def get_dependency_state(dependency_id, owner, repo):
 
 def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=False):
     state = STATUS_SUCCESS if are_dependencies_met else STATUS_FAILURE
-    description = "Dependencies: {}".format(', '.join(dependencies))
+    description = "All dependencies are met: {}" if are_dependencies_met else "Not all dependencies are met: {}"
+    description = description.format(', '.join(dependencies))
 
     url = "{}repos/{}/{}/statuses/{}".format(
         BASE_GITHUB_URL,
