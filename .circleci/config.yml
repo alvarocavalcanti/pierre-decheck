@@ -10,4 +10,4 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: Tests
-          command: python -u tests.py
+          command: python -m unittest tests.py
