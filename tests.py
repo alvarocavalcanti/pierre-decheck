@@ -81,7 +81,7 @@ class ServerTest(TestCase):
     def test_updates_issue_status_based_on_pr_created_event_dependencies(
             self, requests_mock, dependency_state_mock, get_sha_mock
     ):
-        dependency_state_mock.return_value = ['closed']
+        dependency_state_mock.return_value = 'closed'
         get_sha_mock.return_value = "dummy-sha"
 
         payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2.")
@@ -105,7 +105,7 @@ class ServerTest(TestCase):
         expected_data = {
             "state": "success",
             "target_url": server.TARGET_URL,
-            "description": "All dependencies are met: 2",
+            "description": "All dependencies are met: (2: closed)",
             "context": server.CONTEXT
         }
 
