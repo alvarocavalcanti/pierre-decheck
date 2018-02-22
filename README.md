@@ -1,10 +1,25 @@
 [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
 # Pierre DeCheck
-Pull Request Dependency Check
+Pull Request Dependency Check.
 
-## Road Map
-[Roadmap](Roadmap.md)
+It checks for pull requests dependencies, specified using keywords on pull request body or comments.
+
+# Installation
+
+1. Checkout/download this repo
+1. Publish the app wherever suits you the best (it already has [Heroku](http://www.heroku.com) in place) and take note of the app's URL
+1. Go to the repository you want to set it up, then go to **Settings > Webhooks > Add Webhook**
+1. Under "Payload URL" enter `<YOUR_APP_URL>/webhook`
+1. Under "Content type" select "application/json"
+1. Under "Which events would you like to trigger this webhook?" select "Let me select individual events." and then: "Commit comment", "Issue comment", "Pull request" and "Pull request review comment"
+1. Finally, make sure "Active" is selected and then create the webhook
+
+# Usage
+
+1. Create a pull request on the repository that has *pierre* set up
+1. Add the keywords "Depends on #" followed by an issue/pull request number, `Depends on #2`, to the pull request description, or later, as a comment
+1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section
 
 ## References
 
