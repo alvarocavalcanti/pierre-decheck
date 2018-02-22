@@ -25,7 +25,7 @@ def root_list():
 def webhook_event():
     # print("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
     owner, repo = get_owner_and_repo(request.data)
-    bodies = get_bodies(request.data)
+    bodies = get_all_bodies(request.data)
     dependencies = get_dependencies_from_bodies(bodies)
     dependencies_and_states = []
     for dep in dependencies:
@@ -46,10 +46,23 @@ def webhook_event():
                 are_dependencies_met = False
 
         update_commit_status(
-            owner=owner, repo=repo, sha=sha, dependencies=dependencies, are_dependencies_met=are_dependencies_met
+            owner=owner,
+            repo=repo,
+            sha=sha,
+            dependencies=dependencies_and_states,
+            are_dependencies_met=are_dependencies_met
         )
 
     return {}, status.HTTP_201_CREATED
+
+
+def get_all_bodies(data):
+    bodies_from_event = get_bodies(data)
+    bodies_from_comments = get_bodies_from_pr_comments(data)
+    bodies = []
+    bodies.extend(bodies_from_event)
+    bodies.extend(bodies_from_comments)
+    return bodies
 
 
 def get_sha(data):
@@ -63,6 +76,22 @@ def get_sha(data):
         commits = json.loads(response.text)
         return commits[0].get("sha", None)
     return None
+
+
+def get_bodies_from_pr_comments(event_data):
+    try:
+        pr_url = event_data.get("pull_request").get("url")
+    except AttributeError:
+        pr_url = event_data.get("issue").get("pull_request").get("url")
+    comments_url = "{}/comments".format(pr_url)
+    comments_url = comments_url.replace("pulls/", "issues/")
+
+    response = requests.request('GET', comments_url)
+    if response.status_code == status.HTTP_200_OK:
+        comments = json.loads(response.text)
+        return [comment.get("body") for comment in comments]
+
+    return []
 
 
 def get_bodies(event_object):
@@ -118,7 +147,7 @@ def get_dependency_state(dependency_id, owner, repo):
 def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=False):
     state = STATUS_SUCCESS if are_dependencies_met else STATUS_FAILURE
     description = "All dependencies are met: {}" if are_dependencies_met else "Not all dependencies are met: {}"
-    description = description.format(', '.join(dependencies))
+    description = description.format(', '.join('({}: {})'.format(*dep) for dep in dependencies))
 
     url = "{}repos/{}/{}/statuses/{}".format(
         BASE_GITHUB_URL,
