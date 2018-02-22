@@ -112,7 +112,7 @@ def get_dependencies_from_bodies(bodies):
         if deps:
             dependencies.extend(deps)
 
-    return [dep for dep in dependencies if dep]
+    return list(set(dependencies))
 
 
 def get_owner_and_repo(event):
