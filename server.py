@@ -62,7 +62,7 @@ def details():
     dependencies_and_states = info.split('-')
     dependencies_info = [dep.replace(':', ' is ') for dep in dependencies_and_states]
 
-    return dependencies_info, status.HTTP_200_OK
+    return {"dependencies": dependencies_info}, status.HTTP_200_OK
 
 
 def get_all_bodies(data):
