@@ -23,7 +23,7 @@ def root_list():
 
 @app.route("/webhook", methods=['POST'])
 def webhook_event():
-    # print("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
+    print("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
     owner, repo = get_owner_and_repo(request.data)
     bodies = get_all_bodies(request.data)
     dependencies = get_dependencies_from_bodies(bodies)
