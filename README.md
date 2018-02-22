@@ -16,6 +16,8 @@ It checks for pull requests dependencies, specified using keywords on pull reque
 1. Under "Content type" select "application/json"
 1. Under "Which events would you like to trigger this webhook?" select "Let me select individual events." and then: "Commit comment", "Issue comment", "Pull request" and "Pull request review comment"
 1. Finally, make sure "Active" is selected and then create the webhook
+1. [Create an access token for your repo](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+1. Add the token as an environment variable for you app, labeled `GITHUB_TOKEN`
 
 # Usage
 
