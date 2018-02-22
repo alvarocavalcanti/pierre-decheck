@@ -10,6 +10,6 @@ flake8:
 setup: activate-env
 	pip install -r requirements.txt
 test: setup
-	python -m unittest tests.py
+	python3 -m unittest tests.ServerTest
 deploy:
 	git push heroku master

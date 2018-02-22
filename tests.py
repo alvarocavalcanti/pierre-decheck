@@ -45,8 +45,8 @@ class ServerTest(TestCase):
         dependencies = server.get_dependencies_from_bodies(bodies)
 
         self.assertEqual(2, len(dependencies))
-        self.assertEqual("2", dependencies[0])
-        self.assertEqual("3", dependencies[1])
+        self.assertIn("2", dependencies)
+        self.assertIn("3", dependencies)
 
     def test_get_dependencies_identifiers_from_single_body(self):
         bodies = ["Depends on #2. Depends on #3"]
@@ -54,8 +54,8 @@ class ServerTest(TestCase):
         dependencies = server.get_dependencies_from_bodies(bodies)
 
         self.assertEqual(2, len(dependencies))
-        self.assertEqual("2", dependencies[0])
-        self.assertEqual("3", dependencies[1])
+        self.assertIn("2", dependencies)
+        self.assertIn("3", dependencies)
 
     @patch('server.requests.request')
     def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
