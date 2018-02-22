@@ -179,3 +179,9 @@ class ServerTest(TestCase):
 
         self.assertEqual("alvarocavalcanti", owner)
         self.assertEqual("pierre-decheck", repo)
+
+    def test_get_dependencies_removes_duplicates(self):
+        bodies = ["Depends on #2", "", "depends on #3", "depends on #3"]
+        dependencies = server.get_dependencies_from_bodies(bodies)
+
+        self.assertEqual(2, len(dependencies))
