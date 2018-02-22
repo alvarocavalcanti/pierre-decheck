@@ -11,6 +11,7 @@ app = FlaskAPI(__name__)
 STATUS_FAILURE = 'failure'
 STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
+TARGET_URL = "https://infinite-harbor-38537.herokuapp.com"
 KEYWORDS_DEPENDS_ON = "depends on"
 CONTEXT = "continuous-integration/pierre-decheck"
 
@@ -129,7 +130,7 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
 
     data = {
         "state": state,
-        "target_url": "foo",
+        "target_url": TARGET_URL,
         "description": description,
         "context": CONTEXT
     }
