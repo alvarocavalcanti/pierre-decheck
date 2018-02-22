@@ -8,7 +8,7 @@ It checks for pull requests dependencies, specified using keywords on pull reque
 # Installation
 
 1. Checkout/download this repo
-1. Publish the app wherever suits you the best (it already has [Heroku](http://www.heroku.com) in place) and take note of the app's URL
+1. Publish the app wherever suits you the best (it already has [Heroku](http://www.heroku.com) configuration in place) and take note of the app's URL
 1. Go to the repository you want to set it up, then go to **Settings > Webhooks > Add Webhook**
 1. Under "Payload URL" enter `<YOUR_APP_URL>/webhook`
 1. Under "Content type" select "application/json"
