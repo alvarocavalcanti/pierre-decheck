@@ -75,14 +75,18 @@ class ServerTest(TestCase):
 
         requests_mock.assert_any_call('GET', expected_url)
 
+    @patch('server.get_sha')
     @patch('server.get_dependency_state')
     @patch('server.requests.request')
-    def test_updates_issue_status_based_on_pr_created_event_dependencies(self, requests_mock, dependency_state_mock):
+    def test_updates_issue_status_based_on_pr_created_event_dependencies(
+            self, requests_mock, dependency_state_mock, get_sha_mock
+    ):
         dependency_state_mock.return_value = ['closed']
+        get_sha_mock.return_value = "dummy-sha"
 
         payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2.")
 
-        sha = json.loads(payload).get("pull_request").get("head").get("sha")
+        sha = "dummy-sha"
 
         response = self.client.post(
             "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'

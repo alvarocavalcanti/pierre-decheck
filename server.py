@@ -30,8 +30,14 @@ def webhook_event():
         state = get_dependency_state(dependency_id=dep, owner=owner, repo=repo)
         dependencies_and_states.append((dep, state))
 
+    print("Owner: {}, Repo: {}. Dependencies: {}".format(
+        owner,
+        repo,
+        ', '.join(dependencies_and_states)
+    ))
+
     if dependencies_and_states and len(dependencies_and_states) > 0:
-        sha = request.data.get("pull_request").get("head").get("sha")
+        sha = get_sha(request.data)
         are_dependencies_met = True
         for dep, state in dependencies_and_states:
             if state == "open":
@@ -42,6 +48,19 @@ def webhook_event():
         )
 
     return {}, status.HTTP_201_CREATED
+
+
+def get_sha(data):
+    try:
+        pr_url = data.get("pull_request").get("url")
+    except AttributeError:
+        pr_url = data.get("issue").get("pull_request").get("url")
+    commits_url = "{}/commits".format(pr_url)
+    response = requests.request('GET', commits_url)
+    if response.status_code == status.HTTP_200_OK:
+        commits = json.loads(response.text)
+        return commits[-1].get("sha", None)
+    return None
 
 
 def get_bodies(event_object):
@@ -111,6 +130,8 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
         "description": description,
         "context": CONTEXT
     }
+
+    print("Update commit status: {}".format(data))
 
     requests.request('POST', url, data=json.dumps(data))
 
