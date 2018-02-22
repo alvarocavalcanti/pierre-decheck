@@ -5,6 +5,8 @@ Pull Request Dependency Check.
 
 It checks for pull requests dependencies, specified using keywords on pull request body or comments.
 
+**Currently supported: dependencies of the same repository only.**
+
 # Installation
 
 1. Checkout/download this repo
@@ -19,7 +21,9 @@ It checks for pull requests dependencies, specified using keywords on pull reque
 
 1. Create a pull request on the repository that has *pierre* set up
 1. Add the keywords "Depends on #" followed by an issue/pull request number, `Depends on #2`, to the pull request description, or later, as a comment
-1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section
+![Pull Request Checks Example](pull_request_keywords.png)
+1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section:
+![Pull Request Checks Example](pull_request_checks.png)
 
 ## References
 
