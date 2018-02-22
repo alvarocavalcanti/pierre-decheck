@@ -1,5 +1,6 @@
 import json
 
+import os
 import requests
 from flask import request
 
@@ -124,6 +125,8 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
         sha
     )
 
+    headers = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
+
     data = {
         "state": state,
         "target_url": "foo",
@@ -133,8 +136,8 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
 
     print("Update commit status: URL: {} \n Data: {}".format(url, data))
 
-    response = requests.request('POST', url, data=json.dumps(data))
-    
+    response = requests.request('POST', url, headers=headers, data=json.dumps(data))
+
     print("Update status code: {}, response data: {}".format(response.status_code, response.text))
 
 
