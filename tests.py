@@ -100,14 +100,16 @@ class ServerTest(TestCase):
             sha
         )
 
+        headers = {'Authorization': 'Token '}
+
         expected_data = {
             "state": "success",
             "target_url": server.TARGET_URL,
-            "description": "Dependencies #: 2",
+            "description": "Dependencies: 2",
             "context": server.CONTEXT
         }
 
-        requests_mock.assert_any_call('POST', expected_url, data=json.dumps(expected_data))
+        requests_mock.assert_any_call('POST', expected_url, headers=headers, data=json.dumps(expected_data))
 
     @patch('server.requests.request')
     def failing_test_checks_dependencies_upon_receiving_pr_created_event_for_more_than_one_dependency(
