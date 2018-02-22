@@ -12,3 +12,4 @@ Pull Request Dependency Check
 1. [Github Webhooks](https://developer.github.com/webhooks/#delivery-headers)
 1. [Github Events](https://developer.github.com/v3/activity/events/)
 1. [Github Event Types & Payloads](https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent)
+1. [Building a CI Server (Github Guide)](https://developer.github.com/v3/guides/building-a-ci-server/)
