@@ -134,13 +134,33 @@ def get_owner_and_repo(event):
 def extract_dependency_id(comment_body):
     import re
     comment_body = comment_body.lower()
-    regex = r"(?:{}).(?:\#)(\d*)".format("depends on")
+    regex = r"(?:{})([A-Za-z0-9-_]+\/[A-Za-z0-9-_]+)*(?:\#)(\d*)".format("depends on ")
     match = re.findall(regex, comment_body)
     if match:
-        return match
+        items = []
+        for match1, match2 in match:
+            if match1:
+                item = "{}#{}".format(match1, match2)
+            else:
+                item = match2
+            items.append(item)
+
+        return items
+
+
+def get_external_owner_and_repo(dependency_id):
+    import re
+    regex = r"([A-Za-z0-9-_]+)(?:\/)([A-Za-z0-9-_]+)*(?:\#)(\d*)"
+    match = re.findall(regex, dependency_id)
+    if match:
+        owner, repo, dependency_id = match[0]
+        return owner, repo, dependency_id
 
 
 def get_dependency_state(dependency_id, owner, repo):
+    if is_external_dependency(dependency_id):
+        owner, repo, dependency_id = get_external_owner_and_repo(dependency_id)
+
     url = "{}repos/{}/{}/issues/{}".format(
         BASE_GITHUB_URL,
         owner,
@@ -180,6 +200,10 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
     response = requests.request('POST', url, headers=headers, data=json.dumps(data))
 
     print("Update status code: {}, response data: {}".format(response.status_code, response.text))
+
+
+def is_external_dependency(dependency):
+    return "#" in dependency
 
 
 if __name__ == "__main__":
