@@ -5,7 +5,10 @@ Pull Request Dependency Check.
 
 It checks for pull requests dependencies, specified using keywords on pull request body or comments.
 
-**Currently supported: dependencies of the same repository only.**
+It supports both same-repo and external dependencies:
+
+* Same repo: Depends on #1
+* External: Depends on alvarocavalcanti/pierre-decheck#1
 
 # Installation
 
