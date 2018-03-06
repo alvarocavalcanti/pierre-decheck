@@ -3,7 +3,7 @@ Continuous-Integration: [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pi
 # Pierre DeCheck
 Pull Request Dependency Check.
 
-It checks for pull requests dependencies, specified using keywords on pull request body or comments.
+It checks for pull requests dependencies, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
 
 * Same repo: Depends on #1
 * External: Depends on alvarocavalcanti/pierre-decheck#1
