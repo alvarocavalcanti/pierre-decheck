@@ -15,6 +15,7 @@ TARGET_URL = "https://infinite-harbor-38537.herokuapp.com/details?info={}"
 KEYWORDS_DEPENDS_ON = "depends on"
 CONTEXT = "ci/pierre-decheck"
 
+HEADERS = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
 
 @app.route("/", methods=['GET', 'POST'])
 def root_list():
@@ -76,11 +77,11 @@ def get_all_bodies(data):
 
 def get_sha(data):
     try:
-        pr_url = data.get("pull_request").get("url")
+        pr_url = data.get("issue").get("pull_request").get("url")
     except AttributeError:
         pr_url = data.get("issue").get("url")
     commits_url = "{}/commits".format(pr_url)
-    response = requests.request('GET', commits_url)
+    response = requests.request('GET', commits_url, headers=HEADERS)
     if response.status_code == status.HTTP_200_OK:
         commits = json.loads(response.text)
         return commits[0].get("sha", None)
@@ -95,7 +96,7 @@ def get_bodies_from_pr_comments(event_data):
     comments_url = "{}/comments".format(pr_url)
     comments_url = comments_url.replace("pulls/", "issues/")
 
-    response = requests.request('GET', comments_url)
+    response = requests.request('GET', comments_url, headers=HEADERS)
     if response.status_code == status.HTTP_200_OK:
         comments = json.loads(response.text)
         return [comment.get("body") for comment in comments]
@@ -167,7 +168,7 @@ def get_dependency_state(dependency_id, owner, repo):
         repo,
         dependency_id
     )
-    response = requests.request('GET', url)
+    response = requests.request('GET', url, headers=HEADERS)
     if response.status_code == status.HTTP_200_OK:
         return json.loads(response.text).get('state', None)
     return None
@@ -186,8 +187,6 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
         sha
     )
 
-    headers = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
-
     data = {
         "state": state,
         "target_url": target_url,
@@ -197,7 +196,7 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
 
     print("Update commit status: URL: {} \n Data: {}".format(url, data))
 
-    response = requests.request('POST', url, headers=headers, data=json.dumps(data))
+    response = requests.request('POST', url, headers=HEADERS, data=json.dumps(data))
 
     print("Update status code: {}, response data: {}".format(response.status_code, response.text))
 
