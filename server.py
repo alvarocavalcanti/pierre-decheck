@@ -88,12 +88,10 @@ def get_sha(data):
 
 
 def get_bodies_from_pr_comments(event_data):
-    pr_url = event_data.get("pull_request", {}).get("url", None)
-    if pr_url is None:
-        pr_url = event_data.get("issue", {}).get("pull_request", {}).get("url", None)
-
-    return [] is pr_url is None
-    
+    try:
+        pr_url = event_data.get("pull_request").get("url")
+    except AttributeError:
+        pr_url = event_data.get("issue").get("url")
     comments_url = "{}/comments".format(pr_url)
     comments_url = comments_url.replace("pulls/", "issues/")
 
