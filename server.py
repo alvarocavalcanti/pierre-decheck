@@ -39,7 +39,7 @@ def webhook_event():
         dependencies_and_states
     ))
 
-    if dependencies_and_states and len(dependencies_and_states) > 0:
+    if len(dependencies) == 0 or (dependencies_and_states and len(dependencies_and_states) > 0):
         sha = get_sha(request.data)
         are_dependencies_met = True
         for dep, state in dependencies_and_states:
