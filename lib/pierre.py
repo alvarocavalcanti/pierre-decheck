@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import logging
+import datetime
 
 STATUS_FAILURE = 'failure'
 STATUS_SUCCESS = 'success'
@@ -61,9 +62,9 @@ def get_all_bodies(data):
 
 def get_sha(data):
     try:
-        pr_url = data.get("issue").get("pull_request").get("url")
+        pr_url = data.get("pull_request").get("url")
     except AttributeError:
-        pr_url = data.get("issue").get("url")
+        pr_url = data.get("issue").get("pull_request").get("url")
 
     commits_url = "{}/commits".format(pr_url)
     response = requests.request('GET', commits_url, headers=HEADERS)
@@ -71,7 +72,9 @@ def get_sha(data):
     if response.status_code == HTTP_200_OK:
         logger.info("SHA list: " + response.text)
         commits = json.loads(response.text)
-        return commits[0].get("sha", None)
+        sorted_commits = sorted(commits, key=lambda x: datetime.datetime.strptime(
+            x['commit']['author']['date'], '%Y-%m-%dT%H:%M:%SZ'), reverse=True)
+        return sorted_commits[0].get("sha", None)
     return None
 
 
