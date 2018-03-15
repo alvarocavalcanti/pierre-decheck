@@ -1,0 +1,42 @@
+# For full config options, check the docs:
+#    docs.serverless.com
+
+service: pierre
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: 'dev'
+  region: us-east-1
+  versionFunctions: false
+  memorySize: 128
+
+functions:
+  pierre:
+    handler: pierre_lambda.pierre_decheck
+    events:
+      - http:
+          path: pierre
+          method: post
+#      - cloudwatchLog:
+#          logGroup: '/aws/lambda/pierre'
+#          filter: ''
+
+#    Define function environment variables here
+    environment:
+      GITHUB_TOKEN: value2
+      GITHUB_SECRET: value2
+#    package: #specifications for the serverless-package-python-functions plugin
+#      include:
+#        - pierre
+#      artifact: ${self:custom.pkgPyFuncs.buildDir}/pierre.zip
+##
+#plugins:
+#  - serverless-package-python-functions
+#
+#custom:
+#  pkgPyFuncs: # plugin configuration
+#    buildDir: _build
+#    globalIncludes:
+#      - ./lib
+#    cleanup: true
