@@ -77,9 +77,13 @@ def get_all_bodies(data):
 
 def get_sha(data):
     try:
-        pr_url = data.get("issue").get("pull_request").get("url")
+        pr_url = data.get("pull_request").get("url")
     except AttributeError:
-        pr_url = data.get("issue").get("url")
+        try:
+            pr_url = data.get("issue").get("url")
+        except AttributeError:
+            pr_url = data.get("issue").get("pull_request").get("url")
+
     commits_url = "{}/commits".format(pr_url)
     response = requests.request('GET', commits_url, headers=HEADERS)
     if response.status_code == status.HTTP_200_OK:
