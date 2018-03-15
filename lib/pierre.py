@@ -2,7 +2,11 @@ import json
 import requests
 import os
 import logging
+import hmac
+import hashlib
+import urllib.parse
 import datetime
+
 
 STATUS_FAILURE = 'failure'
 STATUS_SUCCESS = 'success'
@@ -12,12 +16,18 @@ CONTEXT = "ci/pierre-decheck"
 TARGET_URL = "https://infinite-harbor-38537.herokuapp.com/details?info={}"
 HTTP_200_OK = 200
 HEADERS = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
+GITHUB_SECRET = os.getenv("GITHUB_SECRET", "").encode('utf-8')
+USE_GITHUB_SECRET = os.getenv("USE_GITHUB_SECRET", False)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def check(payload):
+def check(payload, headers):
+    verification, reply = verify_source_is_github(payload, headers)
+    if not verification:
+        return reply
+
     owner, repo = get_owner_and_repo(payload)
     bodies = get_all_bodies(payload)
     dependencies = get_dependencies_from_bodies(bodies)
@@ -50,6 +60,37 @@ def check(payload):
 
     return {"statusCode": 201, "body": ""}
 
+
+def _get_digest(secret, data):
+    paybytes = urllib.parse.urlencode(data).encode('utf8')
+    return hmac.new(
+        secret, paybytes,
+        hashlib.sha1).hexdigest() if secret else None
+
+
+def verify_source_is_github(data, headers):
+    if USE_GITHUB_SECRET:
+        if data is None:
+            return False, {"statusCode": 400, "body": "Request body must contain json"}
+
+        digest = _get_digest(GITHUB_SECRET, data)
+        if digest is not None:
+            header_signature = headers.get("X-Hub-Signature")
+            sig_parts = header_signature.split('=', 1)
+
+            if not isinstance(digest, str):
+                digest = str(digest)
+
+            if (len(sig_parts) < 2 or sig_parts[0] != 'sha1'
+                or not hmac.compare_digest(sig_parts[1], digest)):
+                return False, {"statusCode": 400, "body": "Invalid Signature"}
+
+    # Implement ping
+    event = headers.get('X-GitHub-Event', 'ping')
+    if event == 'ping':
+        return False, {"statusCode": 200, "body": {'msg': 'pong'}}
+
+    return True, {}
 
 def get_all_bodies(data):
     bodies_from_event = get_bodies(data)
