@@ -1,10 +1,8 @@
 from flask import request
-
 from flask_api import FlaskAPI, status
-
 from lib.pierre import check
-app = FlaskAPI(__name__)
 
+app = FlaskAPI(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
 def root_list():
@@ -15,7 +13,7 @@ def root_list():
 def webhook_event():
 
     # print("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
-    result = check(request.data)
+    result = check(request.data, request.headers)
     return result.get("body"), result.get("statusCode")
 
 @app.route("/details", methods=['GET'])
