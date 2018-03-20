@@ -105,7 +105,10 @@ def get_sha(data):
     try:
         pr_url = data.get("pull_request").get("url")
     except AttributeError:
-        pr_url = data.get("issue").get("pull_request").get("url")
+        try:
+            pr_url = data.get("issue").get("pull_request").get("url")
+        except AttributeError:
+            pr_url = data.get("issue").get("url")
 
     commits_url = "{}/commits".format(pr_url)
     response = requests.request('GET', commits_url, headers=HEADERS)
@@ -212,6 +215,8 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
         description = "All dependencies are met: {}" if are_dependencies_met else "Not all dependencies are met: {}"
         description = description.format(
             ', '.join('({}: {})'.format(*dep) for dep in dependencies))
+        target_url = TARGET_URL.format(
+            '-'.join('{}:{}'.format(*dep) for dep in dependencies))
 
         url = "{}repos/{}/{}/statuses/{}".format(
             BASE_GITHUB_URL,
@@ -222,7 +227,7 @@ def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=Fa
 
         data = {
             "state": state,
-            "target_url": None,
+            "target_url": target_url,
             "description": description,
             "context": CONTEXT
         }

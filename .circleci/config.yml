@@ -7,7 +7,10 @@ jobs:
       - checkout
       - run:
           name: Dependencies
-          command: pip install -r requirements.txt
+          command: pip install -r requirements.txt -r requirements-dev.txt
       - run:
           name: Tests
           command: python -m unittest tests.py
+      - run:
+          name: PyTests
+          command: py.test tests
