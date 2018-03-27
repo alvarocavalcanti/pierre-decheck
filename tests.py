@@ -1,13 +1,15 @@
 import json
+import unittest
 from unittest.mock import patch
 
 from flask_api import status
 from flask_testing import TestCase
 
+
 import server
-from payloads import PR_COMMENT_EVENT, PR_CREATED
-
-
+from lib.payloads import PR_COMMENT_EVENT, PR_CREATED
+from lib import pierre
+from lib.pierre import HEADERS as request_headers
 class ServerTest(TestCase):
     render_templates = False
 
@@ -26,81 +28,26 @@ class ServerTest(TestCase):
         response = self.client.get("/")
         self.assert200(response)
 
-    def test_get_bodies_from_pr_comment_event(self):
-        bodies = server.get_bodies(json.loads(PR_COMMENT_EVENT))
-
-        self.assertEqual(2, len(bodies))
-        self.assertEqual("This is the PR body", bodies[0])
-        self.assertEqual("this is a comment", bodies[1])
-
-    def test_get_bodies_from_pr_created_event(self):
-        bodies = server.get_bodies(json.loads(PR_CREATED))
-
-        self.assertEqual(1, len(bodies))
-        self.assertEqual("This is the PR body", bodies[0])
-
-    def test_get_dependencies_identifiers_from_list(self):
-        bodies = ["Depends on #2", "", "depends on #3", "No dependencies here"]
-
-        dependencies = server.get_dependencies_from_bodies(bodies)
-
-        self.assertEqual(2, len(dependencies))
-        self.assertIn("2", dependencies)
-        self.assertIn("3", dependencies)
-
-    def test_get_dependencies_identifiers_from_single_body(self):
-        bodies = ["Depends on #2. Depends on #3"]
-
-        dependencies = server.get_dependencies_from_bodies(bodies)
-
-        self.assertEqual(2, len(dependencies))
-        self.assertIn("2", dependencies)
-        self.assertIn("3", dependencies)
-
-    def test_get_dependencies_removes_duplicates(self):
-        bodies = ["Depends on #2", "", "depends on #3", "depends on #3"]
-        dependencies = server.get_dependencies_from_bodies(bodies)
-
-        self.assertEqual(2, len(dependencies))
-
-    def test_get_dependencies_accepts_external_dependencies(self):
-        bodies = ["Depends on #2", "", "depends on alvarocavalcanti/my-dev-templates#1"]
-        dependencies = server.get_dependencies_from_bodies(bodies)
-
-        self.assertEqual(2, len(dependencies))
-        self.assertIn("2", dependencies)
-        self.assertIn("alvarocavalcanti/my-dev-templates#1", dependencies)
-
-    def test_is_external_dependency(self):
-        self.assertTrue(server.is_external_dependency("alvarocavalcanti/my-dev-templates#1"))
-        self.assertFalse(server.is_external_dependency("1"))
-
-    def test_get_external_owner_and_repo(self):
-        owner, repo, dependency_id = server.get_external_owner_and_repo("alvarocavalcanti/my-dev-templates#1")
-
-        self.assertEqual("alvarocavalcanti", owner)
-        self.assertEqual("my-dev-templates", repo)
-        self.assertEqual("1", dependency_id)
-
-    @patch('server.requests.request')
+    @patch('lib.pierre.requests.request')
     def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
         payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2.")
 
         response = self.client.post(
             "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'
         )
+
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url = "{}repos/{}/{}/issues/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             "2"
         )
 
-        requests_mock.assert_any_call('GET', expected_url)
+        requests_mock.assert_any_call('GET', expected_url, headers=request_headers)
 
-    @patch('server.requests.request')
+    @patch('lib.pierre.requests.request')
     def test_checks_external_dependencies_upon_receiving_pr_created_event(self, requests_mock):
         payload = PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on foo-owner/foo-repo#2.")
 
@@ -110,20 +57,22 @@ class ServerTest(TestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url = "{}repos/{}/{}/issues/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "foo-owner",
             "foo-repo",
             "2"
         )
 
-        requests_mock.assert_any_call('GET', expected_url)
+        requests_mock.assert_any_call('GET', expected_url, headers=request_headers)
 
-    @patch('server.get_sha')
-    @patch('server.get_dependency_state')
-    @patch('server.requests.request')
+    @patch('lib.pierre.get_sha')
+    @patch('lib.pierre.get_dependency_state')
+    @patch('lib.pierre.requests.request')
+    @patch('lib.pierre.verify_source_is_github')
     def test_updates_issue_status_based_on_pr_created_event_dependencies(
-            self, requests_mock, dependency_state_mock, get_sha_mock
+            self, verify_mock, requests_mock, dependency_state_mock, get_sha_mock
     ):
+        verify_mock.return_value = True, {}
         dependency_state_mock.return_value = 'closed'
         get_sha_mock.return_value = "dummy-sha"
 
@@ -137,7 +86,7 @@ class ServerTest(TestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url = "{}repos/{}/{}/statuses/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             sha
@@ -147,16 +96,16 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "success",
-            "target_url": server.TARGET_URL.format('2:closed'),
+            "target_url": pierre.TARGET_URL.format('2:closed'),
             "description": "All dependencies are met: (2: closed)",
-            "context": server.CONTEXT
+            "context": pierre.CONTEXT
         }
 
         requests_mock.assert_any_call('POST', expected_url, headers=headers, data=json.dumps(expected_data))
 
-    @patch('server.get_sha')
-    @patch('server.get_dependency_state')
-    @patch('server.requests.request')
+    @patch('lib.pierre.get_sha')
+    @patch('lib.pierre.get_dependency_state')
+    @patch('lib.pierre.requests.request')
     def test_updates_issue_status_based_on_pr_created_event_with_external_dependencies(
             self, requests_mock, dependency_state_mock, get_sha_mock
     ):
@@ -173,7 +122,7 @@ class ServerTest(TestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url = "{}repos/{}/{}/statuses/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             sha
@@ -183,14 +132,14 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "success",
-            "target_url": server.TARGET_URL.format('foo-owner/foo-repo#2:closed'),
+            "target_url": pierre.TARGET_URL.format('foo-owner/foo-repo#2:closed'),
             "description": "All dependencies are met: (foo-owner/foo-repo#2: closed)",
-            "context": server.CONTEXT
+            "context": pierre.CONTEXT
         }
 
-        requests_mock.assert_any_call('POST', expected_url, headers=headers, data=json.dumps(expected_data))
+        requests_mock.assert_any_call('POST', expected_url, headers=request_headers, data=json.dumps(expected_data))
 
-    @patch('server.requests.request')
+    @patch('lib.pierre.requests.request')
     def failing_test_checks_dependencies_upon_receiving_pr_created_event_for_more_than_one_dependency(
             self, requests_mock
     ):
@@ -202,23 +151,23 @@ class ServerTest(TestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url_dep_2 = "{}repos/{}/{}/issues/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             "2"
         )
 
         expected_url_dep_3 = "{}repos/{}/{}/issues/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             "3"
         )
 
-        requests_mock.assert_any_call('GET', expected_url_dep_2)
-        requests_mock.assert_any_call('GET', expected_url_dep_3)
+        requests_mock.assert_any_call('GET', expected_url_dep_2, headers=request_headers)
+        requests_mock.assert_any_call('GET', expected_url_dep_3, headers=request_headers)
 
-    @patch('server.requests.request')
+    @patch('lib.pierre.requests.request')
     def test_checks_dependencies_upon_receiving_pr_comment_event_for_more_than_one_dependency(
             self, requests_mock
     ):
@@ -231,30 +180,21 @@ class ServerTest(TestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         expected_url_dep_2 = "{}repos/{}/{}/issues/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             "2"
         )
 
         expected_url_dep_3 = "{}repos/{}/{}/issues/{}".format(
-            server.BASE_GITHUB_URL,
+            pierre.BASE_GITHUB_URL,
             "alvarocavalcanti",
             "pierre-decheck",
             "3"
         )
 
-        requests_mock.assert_any_call('GET', expected_url_dep_2)
-        requests_mock.assert_any_call('GET', expected_url_dep_3)
+        requests_mock.assert_any_call('GET', expected_url_dep_2, headers=request_headers)
+        requests_mock.assert_any_call('GET', expected_url_dep_3, headers=request_headers)
 
-    def test_get_owner_and_repo_from_pr_created_event(self):
-        owner, repo = server.get_owner_and_repo(json.loads(PR_CREATED))
-
-        self.assertEqual("alvarocavalcanti", owner)
-        self.assertEqual("pierre-decheck", repo)
-
-    def test_get_owner_and_repo_from_pr_comment_event(self):
-        owner, repo = server.get_owner_and_repo(json.loads(PR_COMMENT_EVENT))
-
-        self.assertEqual("alvarocavalcanti", owner)
-        self.assertEqual("pierre-decheck", repo)
+if __name__ == '__main__':
+    unittest.main()
