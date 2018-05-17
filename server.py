@@ -20,7 +20,7 @@ def webhook_event():
 
 @app.route("/details", methods=['GET'])
 def details():
-    print(">>> SERVER NAME: {}".format(app.config['SERVER_NAME']))
+    print(">>> REQUEST: {}".format(request.__dict__))
     info = request.args.get('info')
     dependencies_and_states = info.split('-')
     dependencies_info = [dep.replace(':', ' is ') for dep in dependencies_and_states]
