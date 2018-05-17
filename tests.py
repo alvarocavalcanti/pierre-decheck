@@ -130,8 +130,6 @@ class ServerTest(TestCase):
             sha
         )
 
-        headers = {'Authorization': 'Token '}
-
         expected_data = {
             "state": "success",
             "target_url": pierre.TARGET_URL.format('foo-owner/foo-repo#2:closed'),
@@ -197,6 +195,7 @@ class ServerTest(TestCase):
 
         requests_mock.assert_any_call('GET', expected_url_dep_2, headers=request_headers)
         requests_mock.assert_any_call('GET', expected_url_dep_3, headers=request_headers)
+
 
 if __name__ == '__main__':
     unittest.main()

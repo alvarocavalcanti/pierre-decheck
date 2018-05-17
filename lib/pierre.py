@@ -7,7 +7,6 @@ import hashlib
 import urllib.parse
 import datetime
 
-
 STATUS_FAILURE = 'failure'
 STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
@@ -43,7 +42,7 @@ def check(payload, headers, host):
         ))
 
     if len(dependencies) == 0 or (
-                dependencies_and_states and len(dependencies_and_states) > 0):
+            dependencies_and_states and len(dependencies_and_states) > 0):
         sha = get_sha(payload)
         are_dependencies_met = True
         for dep, state in dependencies_and_states:
@@ -82,8 +81,7 @@ def verify_source_is_github(data, headers):
             if not isinstance(digest, str):
                 digest = str(digest)
 
-            if (len(sig_parts) < 2 or sig_parts[0] != 'sha1'
-                or not hmac.compare_digest(sig_parts[1], digest)):
+            if len(sig_parts) < 2 or sig_parts[0] != 'sha1' or not hmac.compare_digest(sig_parts[1], digest):
                 return False, {"statusCode": 400, "body": "Invalid Signature"}
 
     # Implement ping
@@ -217,10 +215,7 @@ def update_commit_status(owner, repo, sha, dependencies, host, are_dependencies_
         description = "All dependencies are met: {}" if are_dependencies_met else "Not all dependencies are met: {}"
         description = description.format(
             ', '.join('({}: {})'.format(*dep) for dep in dependencies))
-        target_url = TARGET_URL.format(
-            host
-            ,'-'.join('{}:{}'.format(*dep) for dep in dependencies)
-        )
+        target_url = TARGET_URL.format(host, '-'.join('{}:{}'.format(*dep) for dep in dependencies))
 
         url = "{}repos/{}/{}/statuses/{}".format(
             BASE_GITHUB_URL,
@@ -243,10 +238,9 @@ def update_commit_status(owner, repo, sha, dependencies, host, are_dependencies_
         logger.info(
             "Update status code: {}, response data: {}".format(response.status_code,
                                                                response.text))
-    except:
+    except Exception:
         logger.error("Problem with updating commit", exc_info=True)
 
 
 def is_external_dependency(dependency):
     return "#" in dependency
-

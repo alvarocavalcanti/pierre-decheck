@@ -7,5 +7,3 @@ def pierre_decheck(event, context):
     headers = json.loads(event.get("headers"))
     host = json.loads(event.get("environ").get("HTTP_HOST"))
     return check(event_data, headers, host)
-
-
