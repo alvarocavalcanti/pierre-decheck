@@ -10,6 +10,8 @@ import server
 from lib.payloads import PR_COMMENT_EVENT, PR_CREATED
 from lib import pierre
 from lib.pierre import HEADERS as request_headers
+
+
 class ServerTest(TestCase):
     render_templates = False
 

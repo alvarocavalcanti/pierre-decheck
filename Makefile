@@ -8,7 +8,7 @@ activate-env:
 flake8:
 	flake8 .
 setup: activate-env
-	pip install -r requirements.txt
+	pip install -r requirements.txt || pip3 install -r requirements
 test: setup
 	python3 -m unittest tests.ServerTest
 deploy:

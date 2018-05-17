@@ -14,6 +14,9 @@ GITHUB_HEADERS = {
     "User-Agent": "GitHub-Foo"
 }
 
+HOST = "infinite-harbor-38537.herokuapp.com"
+
+
 class TestPierre(object):
 
     def test_get_bodies_from_pr_comment_event(self):
@@ -78,19 +81,17 @@ class TestPierre(object):
         assert "alvarocavalcanti" == owner
         assert "pierre-decheck" == repo
 
-
     def test_get_owner_and_repo_from_pr_created_event(self):
         owner, repo = get_owner_and_repo(json.loads(PR_CREATED))
 
         assert "alvarocavalcanti" == owner
         assert "pierre-decheck" == repo
 
-
     @patch('lib.pierre.requests.request')
     def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
         payload = json.loads(PR_CREATED.replace("This is the PR body", "This is the PR body. Depends on #2."))
 
-        response = check(payload, headers=GITHUB_HEADERS)
+        response = check(payload, headers=GITHUB_HEADERS, host=HOST)
 
         assert 201 == response.get("statusCode")
 
@@ -110,7 +111,7 @@ class TestPierre(object):
         payload = PR_COMMENT_EVENT.replace("This is the PR body", "Depends on #2.")
         payload = json.loads(payload.replace("this is a comment", "Depends on #3."))
 
-        response = check(payload, headers=GITHUB_HEADERS)
+        response = check(payload, headers=GITHUB_HEADERS, host=HOST)
 
         assert 201 == response.get("statusCode")
 

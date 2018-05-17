@@ -13,7 +13,7 @@ STATUS_SUCCESS = 'success'
 BASE_GITHUB_URL = 'https://api.github.com/'
 KEYWORDS_DEPENDS_ON = "depends on"
 CONTEXT = "ci/pierre-decheck"
-TARGET_URL = "https://infinite-harbor-38537.herokuapp.com/details?info={}"
+TARGET_URL = "https://{}/details?info={}"
 HTTP_200_OK = 200
 HEADERS = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
 GITHUB_SECRET = os.getenv("GITHUB_SECRET", "").encode('utf-8')
@@ -23,7 +23,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def check(payload, headers):
+def check(payload, headers, host):
     verification, reply = verify_source_is_github(payload, headers)
     if not verification:
         return reply
@@ -55,6 +55,7 @@ def check(payload, headers):
             repo=repo,
             sha=sha,
             dependencies=dependencies_and_states,
+            host=host,
             are_dependencies_met=are_dependencies_met
         )
 
@@ -210,14 +211,16 @@ def get_dependency_state(dependency_id, owner, repo):
     return None
 
 
-def update_commit_status(owner, repo, sha, dependencies, are_dependencies_met=False):
+def update_commit_status(owner, repo, sha, dependencies, host, are_dependencies_met=False):
     try:
         state = STATUS_SUCCESS if are_dependencies_met else STATUS_FAILURE
         description = "All dependencies are met: {}" if are_dependencies_met else "Not all dependencies are met: {}"
         description = description.format(
             ', '.join('({}: {})'.format(*dep) for dep in dependencies))
         target_url = TARGET_URL.format(
-            '-'.join('{}:{}'.format(*dep) for dep in dependencies))
+            host
+            ,'-'.join('{}:{}'.format(*dep) for dep in dependencies)
+        )
 
         url = "{}repos/{}/{}/statuses/{}".format(
             BASE_GITHUB_URL,
