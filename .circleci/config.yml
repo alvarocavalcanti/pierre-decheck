@@ -9,6 +9,9 @@ jobs:
           name: Dependencies
           command: pip install -r requirements.txt -r requirements-dev.txt
       - run:
+          name: Flake8
+          command: flake8 .
+      - run:
           name: Tests
           command: python -m unittest tests.py
       - run:
