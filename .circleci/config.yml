@@ -13,7 +13,7 @@ jobs:
           command: flake8 .
       - run:
           name: Tests
-          command: python -m unittest tests.py
+          command: python -m unittest tests.test_server.ServerTest
       - run:
           name: PyTests
           command: py.test tests

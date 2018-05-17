@@ -98,7 +98,7 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "success",
-            "target_url": pierre.TARGET_URL.format('2:closed'),
+            "target_url": pierre.TARGET_URL.format('localhost', '2:closed'),
             "description": "All dependencies are met: (2: closed)",
             "context": pierre.CONTEXT
         }
@@ -132,7 +132,7 @@ class ServerTest(TestCase):
 
         expected_data = {
             "state": "success",
-            "target_url": pierre.TARGET_URL.format('foo-owner/foo-repo#2:closed'),
+            "target_url": pierre.TARGET_URL.format('localhost', 'foo-owner/foo-repo#2:closed'),
             "description": "All dependencies are met: (foo-owner/foo-repo#2: closed)",
             "context": pierre.CONTEXT
         }
