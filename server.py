@@ -4,6 +4,7 @@ from lib.pierre import check
 
 app = FlaskAPI(__name__)
 
+
 @app.route("/", methods=['GET', 'POST'])
 def root_list():
     return "Pierre DeCheck: nothing to see here.", status.HTTP_200_OK
@@ -16,8 +17,10 @@ def webhook_event():
     result = check(request.data, request.headers)
     return result.get("body"), result.get("statusCode")
 
+
 @app.route("/details", methods=['GET'])
 def details():
+    print(">>> SERVER NAME: {}".format(app.config['SERVER_NAME']))
     info = request.args.get('info')
     dependencies_and_states = info.split('-')
     dependencies_info = [dep.replace(':', ' is ') for dep in dependencies_and_states]

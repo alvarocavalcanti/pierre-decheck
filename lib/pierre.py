@@ -92,6 +92,7 @@ def verify_source_is_github(data, headers):
 
     return True, {}
 
+
 def get_all_bodies(data):
     bodies_from_event = get_bodies(data)
     bodies_from_comments = get_bodies_from_pr_comments(data)
