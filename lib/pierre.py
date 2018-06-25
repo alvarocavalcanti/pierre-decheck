@@ -162,7 +162,7 @@ def get_dependencies_from_bodies(bodies, dependency_id):
 
     unique_dependencies = set(dependencies)
     try:
-        unique_depedencies.remove(dependency_id)
+        unique_dependencies.remove(dependency_id)
     except KeyError:
         pass
 
@@ -174,6 +174,7 @@ def get_owner_and_repo(event):
     owner = event.get("repository", {}).get("owner", {}).get("login", "")
 
     return owner, repo
+
 
 def get_dependency_id(event):
     dependency_id = event.get("issue", {}).get("number", "")
