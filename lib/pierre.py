@@ -28,10 +28,10 @@ def check(payload, headers, host):
         return reply
 
     owner, repo = get_owner_and_repo(payload)
-    dependency_id = get_dependency_id(payload)
+    this_pr_id = get_pull_request_id(payload)
 
     bodies = get_all_bodies(payload)
-    dependencies = get_dependencies_from_bodies(bodies, dependency_id)
+    dependencies = get_dependencies_from_bodies(bodies, this_pr_id)
 
     dependencies_and_states = []
     for dep in dependencies:
@@ -153,20 +153,14 @@ def get_bodies(event_object):
     return bodies
 
 
-def get_dependencies_from_bodies(bodies, dependency_id):
+def get_dependencies_from_bodies(bodies, root_id):
     dependencies = []
     for body in bodies:
         deps = extract_dependency_id(body)
-        if deps:
+        if deps && deps != root_id:
             dependencies.extend(deps)
 
-    unique_dependencies = set(dependencies)
-    try:
-        unique_dependencies.remove(dependency_id)
-    except KeyError:
-        pass
-
-    return list(unique_dependencies)
+    return list(set(dependencies))
 
 
 def get_owner_and_repo(event):
@@ -176,11 +170,8 @@ def get_owner_and_repo(event):
     return owner, repo
 
 
-def get_dependency_id(event):
-    dependency_id = event.get("issue", {}).get("number", "")
-    
-    return dependency_id
-
+def get_pull_request_id(event):
+    return event.get("issue", {}).get("number", "")
 
 def extract_dependency_id(comment_body):
     import re
