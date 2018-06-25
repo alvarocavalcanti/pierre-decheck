@@ -157,7 +157,7 @@ def get_dependencies_from_bodies(bodies, root_id):
     dependencies = []
     for body in bodies:
         deps = extract_dependency_id(body)
-        if deps && deps != root_id:
+        if deps && deps != root_id :
             dependencies.extend(deps)
 
     return list(set(dependencies))
@@ -172,6 +172,7 @@ def get_owner_and_repo(event):
 
 def get_pull_request_id(event):
     return event.get("issue", {}).get("number", "")
+
 
 def extract_dependency_id(comment_body):
     import re
