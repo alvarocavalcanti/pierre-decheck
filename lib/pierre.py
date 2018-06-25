@@ -157,7 +157,13 @@ def get_dependencies_from_bodies(bodies, root_id):
     dependencies = []
     for body in bodies:
         deps = extract_dependency_id(body)
+<<<<<<< HEAD
         if deps and deps != root_id:
+=======
+
+        if deps:
+            deps = filter(lambda dependency_id: dependency_id != root_id, deps)
+>>>>>>> bdf0b0b... changes to test
             dependencies.extend(deps)
 
     return list(set(dependencies))
