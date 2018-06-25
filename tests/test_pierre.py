@@ -44,7 +44,8 @@ class TestPierre(object):
     def test_get_dependencies_identifiers_from_single_body(self):
         bodies = ["Depends on #2. Depends on #3"]
 
-        dependencies = get_dependencies_from_bodies(bodies)
+        root_id = 4
+        dependencies = get_dependencies_from_bodies(bodies, root_id)
 
         assert 2 == len(dependencies)
         assert "2" in dependencies
@@ -52,13 +53,17 @@ class TestPierre(object):
 
     def test_get_dependencies_removes_duplicates(self):
         bodies = ["Depends on #2", "", "depends on #3", "depends on #3"]
-        dependencies = get_dependencies_from_bodies(bodies)
+
+        root_id = 4
+        dependencies = get_dependencies_from_bodies(bodies, root_id)
 
         assert 2 == len(dependencies)
 
     def test_get_dependencies_accepts_external_dependencies(self):
         bodies = ["Depends on #2", "", "depends on alvarocavalcanti/my-dev-templates#1"]
-        dependencies = get_dependencies_from_bodies(bodies)
+
+        root_id = 4
+        dependencies = get_dependencies_from_bodies(bodies, root_id)
 
         assert 2 == len(dependencies)
         assert "2" in dependencies
