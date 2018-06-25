@@ -155,20 +155,13 @@ def get_bodies(event_object):
 
 def get_dependencies_from_bodies(bodies, root_id):
     dependencies = []
+
     for body in bodies:
-<<<<<<< HEAD
+
         deps = extract_dependency_id(body)
-<<<<<<< HEAD
-        if deps and deps != root_id:
-=======
 
         if deps:
-            deps = filter(lambda dependency_id: dependency_id != root_id, deps)
->>>>>>> bdf0b0b... changes to test
-=======
-        deps = filter(lambda dependency_id: dependency_id != root_id, extract_dependency_id(body))
-        if deps:
->>>>>>> f2757a2... changes made
+            deps = filter(lambda dependency_id: dependency_id != root_id, extract_dependency_id(body))
             dependencies.extend(deps)
 
     return list(set(dependencies))

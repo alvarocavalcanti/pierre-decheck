@@ -35,7 +35,7 @@ class TestPierre(object):
     def test_get_dependencies_identifiers_from_list(self):
         bodies = ["Depends on #2", "", "depends on #3", "No dependencies here", "Depends on #4"]
 
-	root_id = 4
+        root_id = 4
         dependencies = get_dependencies_from_bodies(bodies, root_id)
 
         assert 2 == len(dependencies)
