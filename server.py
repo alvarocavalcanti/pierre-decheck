@@ -7,7 +7,7 @@ app = FlaskAPI(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
 def root_list():
-    return "Pierre DeCheck: absolutely nothing at all to see here.", status.HTTP_200_OK
+    return "Pierre DeCheck: nothing to see here.", status.HTTP_200_OK
 
 
 @app.route("/webhook", methods=['POST'])
