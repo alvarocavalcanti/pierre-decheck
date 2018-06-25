@@ -258,4 +258,4 @@ def update_commit_status(owner, repo, sha, dependencies, host, are_dependencies_
 
 
 def is_external_dependency(dependency):
-    return "#" in dependenc
+    return "#" in dependency
