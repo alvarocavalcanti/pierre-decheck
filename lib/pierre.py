@@ -153,14 +153,14 @@ def get_bodies(event_object):
     return bodies
 
 
-def get_dependencies_from_bodies(bodies, depedency_id):
+def get_dependencies_from_bodies(bodies, dependency_id):
     dependencies = []
     for body in bodies:
         deps = extract_dependency_id(body)
         if deps:
             dependencies.extend(deps)
 
-    unique_depedencies = set(dependencies)
+    unique_dependencies = set(dependencies)
     try:
         unique_depedencies.remove(dependency_id)
     except KeyError:
@@ -176,7 +176,7 @@ def get_owner_and_repo(event):
     return owner, repo
 
 def get_dependency_id(event):
-    dependency_id = event.get("issue", {}).get("number","")
+    dependency_id = event.get("issue", {}).get("number", "")
     
     return dependency_id
 
