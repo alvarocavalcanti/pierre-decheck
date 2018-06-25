@@ -28,7 +28,7 @@ def check(payload, headers, host):
         return reply
 
     owner, repo = get_owner_and_repo(payload)
-    dependency_id = 4#get_dependency_id(payload)
+    dependency_id = get_dependency_id(payload)
 
     bodies = get_all_bodies(payload)
     dependencies = get_dependencies_from_bodies(bodies, dependency_id)
