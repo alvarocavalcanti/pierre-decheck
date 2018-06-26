@@ -6,6 +6,7 @@ import hmac
 import hashlib
 import urllib.parse
 import datetime
+from flask_api.status import HTTP_200_OK
 
 STATUS_FAILURE = 'failure'
 STATUS_SUCCESS = 'success'
@@ -13,7 +14,6 @@ BASE_GITHUB_URL = 'https://api.github.com/'
 KEYWORDS_DEPENDS_ON = "depends on"
 CONTEXT = "ci/pierre-decheck"
 TARGET_URL = "https://{}/details?info={}"
-HTTP_200_OK = 200
 HEADERS = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
 GITHUB_SECRET = os.getenv("GITHUB_SECRET", "").encode('utf-8')
 USE_GITHUB_SECRET = os.getenv("USE_GITHUB_SECRET", False)
@@ -199,6 +199,12 @@ def get_external_owner_and_repo(dependency_id):
         return owner, repo, dependency_id
 
 
+def issue_does_not_have_release_label(issue, label):
+    labels = json.loads(issue).get('labels', [])
+    labels_descriptions = [label.get("description", "") for label in labels]
+    return label not in labels_descriptions
+
+
 def get_dependency_state(dependency_id, owner, repo):
     if is_external_dependency(dependency_id):
         owner, repo, dependency_id = get_external_owner_and_repo(dependency_id)
@@ -211,7 +217,12 @@ def get_dependency_state(dependency_id, owner, repo):
     )
     response = requests.request('GET', url, headers=HEADERS)
     if response.status_code == HTTP_200_OK:
-        return json.loads(response.text).get('state', None)
+        state = json.loads(response.text).get('state', None)
+        if state and state == "closed":
+            release_label = os.getenv("RELEASE_LABEL", None)
+            if release_label and issue_does_not_have_release_label(issue=response.text, label=release_label):
+                return "open"
+        return state
     return None
 
 

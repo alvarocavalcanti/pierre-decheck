@@ -1,12 +1,15 @@
-import json
+import os
 
-from lib.payloads import PR_COMMENT_EVENT, PR_CREATED
+import json
+from flask_api.status import HTTP_200_OK
+
+from lib.payloads import PR_COMMENT_EVENT, PR_CREATED, ISSUE_DETAIL
 from lib.pierre import (get_bodies, get_dependencies_from_bodies, is_external_dependency,
                         get_external_owner_and_repo, get_owner_and_repo, BASE_GITHUB_URL,
-                        check, HEADERS
-                        )
+                        check, HEADERS,
+                        get_dependency_state)
 
-from mock import patch
+from mock import patch, Mock
 
 GITHUB_HEADERS = {
     "X-GitHub-Event": "issue_comment",
@@ -137,3 +140,32 @@ class TestPierre(object):
 
         requests_mock.assert_any_call('GET', expected_url_dep_2, headers=HEADERS)
         requests_mock.assert_any_call('GET', expected_url_dep_3, headers=HEADERS)
+
+    @patch("requests.request")
+    @patch.dict(os.environ, {'RELEASE_LABEL': 'RELEASED'})
+    def test_gets_dependency_state_as_open_when_issue_is_closed_but_has_not_been_released(self, mock_request):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        issue_detail = ISSUE_DETAIL.replace("ISSUE_STATUS", "closed")
+        request_response.text = issue_detail
+
+        mock_request.return_value = request_response
+
+        issue_state = get_dependency_state("1", "foo", "bar")
+
+        assert "open" == issue_state
+
+    @patch("requests.request")
+    @patch.dict(os.environ, {'RELEASE_LABEL': 'RELEASED'})
+    def test_gets_dependency_state_as_closed_when_issue_is_closed_and_has_been_released(self, mock_request):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        issue_detail = ISSUE_DETAIL.replace("ISSUE_STATUS", "closed")
+        issue_detail = issue_detail.replace("LABEL_DESCRIPTION", "RELEASED")
+        request_response.text = issue_detail
+
+        mock_request.return_value = request_response
+
+        issue_state = get_dependency_state("1", "foo", "bar")
+
+        assert "closed" == issue_state
