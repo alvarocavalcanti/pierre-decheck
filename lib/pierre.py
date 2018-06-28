@@ -47,7 +47,7 @@ def check(payload, headers, host):
         sha = get_sha(payload)
         are_dependencies_met = True
         for dep, state in dependencies_and_states:
-            if state in ["open", "closed-not-released"]:
+            if state in ["open", "closed_not_released"]:
                 are_dependencies_met = False
 
         update_commit_status(
@@ -221,7 +221,7 @@ def get_dependency_state(dependency_id, owner, repo):
         if state and state == "closed":
             release_label = os.getenv("RELEASE_LABEL", None)
             if release_label and not issue_has_release_label(issue=response.text, label=release_label):
-                return "closed-not-released"
+                return "closed_not_released"
         return state
     return None
 
