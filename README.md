@@ -40,6 +40,10 @@ For now, the best way of re-checkind the dependencies statuses is to add a new c
 
 [TBD]
 
+## Code Style
+
+[TBD] Readability over code comments, DAMP vs. DRY
+
 ## Recommended IDEs
 
 [TBD]
