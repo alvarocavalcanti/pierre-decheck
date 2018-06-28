@@ -160,7 +160,7 @@ class TestPierre(object):
 
         issue_state = get_dependency_state("1", "foo", "bar")
 
-        assert "open" == issue_state
+        assert "closed-not-released" == issue_state
 
     @patch("requests.request")
     @patch.dict(os.environ, {'RELEASE_LABEL': 'RELEASED'})
