@@ -47,7 +47,7 @@ def check(payload, headers, host):
         sha = get_sha(payload)
         are_dependencies_met = True
         for dep, state in dependencies_and_states:
-            if state == "open":
+            if state in ["open", "closed-not-released"]:
                 are_dependencies_met = False
 
         update_commit_status(
