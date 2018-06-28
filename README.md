@@ -1,6 +1,7 @@
 Continuous-Integration: [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
 # Pierre DeCheck
+
 Pull Request Dependency Check.
 
 It checks for pull requests dependencies, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
@@ -27,10 +28,8 @@ For now, the best way of re-checkind the dependencies statuses is to add a new c
 # Usage
 
 1. Create a pull request on the repository that has *pierre* set up
-1. Add the keywords `Depends on #` (for same-repo) or "Depends on `owner/repo#`" (for external) followed by an issue/pull request number, `Depends on #2` or `Depends on owner/repo#2`, to the pull request description, or later, as a comment
-![Pull Request Checks Example](pull_request_keywords.png)
-1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section:
-![Pull Request Checks Example](pull_request_checks.png)
+1. Add the keywords `Depends on #` (for same-repo) or "Depends on `owner/repo#`" (for external) followed by an issue/pull request number, `Depends on #2` or `Depends on owner/repo#2`, to the pull request description, or later, as a comment ![Pull Request Checks Example](pull_request_keywords.png)
+1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section: ![Pull Request Checks Example](pull_request_checks.png)
 
 ## Optional feature: Depending on a Released PR
 
