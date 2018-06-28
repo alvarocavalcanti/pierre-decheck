@@ -4,10 +4,17 @@ import json
 from flask_api.status import HTTP_200_OK
 
 from lib.payloads import PR_COMMENT_EVENT, PR_CREATED, ISSUE_DETAIL
-from lib.pierre import (get_bodies, get_dependencies_from_bodies, is_external_dependency,
-                        get_external_owner_and_repo, get_owner_and_repo, BASE_GITHUB_URL,
-                        check, HEADERS,
-                        get_dependency_state)
+from lib.pierre import (
+    get_bodies,
+    get_dependencies_from_bodies,
+    is_external_dependency,
+    get_external_owner_and_repo,
+    get_owner_and_repo,
+    BASE_GITHUB_URL,
+    check,
+    HEADERS,
+    get_dependency_state,
+)
 
 from mock import patch, Mock
 
