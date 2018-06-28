@@ -32,6 +32,22 @@ For now, the best way of re-checkind the dependencies statuses is to add a new c
 1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section:
 ![Pull Request Checks Example](pull_request_checks.png)
 
+# Contributing
+
+[TBD]
+
+## Architecture
+
+[TBD]
+
+## Recommended IDEs
+
+[TBD]
+
+## GitHub Contribution Flow
+
+[TBD]
+
 ## References
 
 1. [Github Repo Statuses](https://developer.github.com/v3/repos/statuses/#create-a-status)
