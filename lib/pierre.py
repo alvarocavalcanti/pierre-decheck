@@ -142,7 +142,7 @@ def get_bodies_from_pr_comments(event_data):
 
 def get_bodies(event_object):
     bodies = []
-    for key, value in event_object.items():
+    for key, value in list(event_object.items()):
         if isinstance(value, dict):
             bodies.extend(get_bodies(value))
         elif key == "body":
@@ -160,7 +160,7 @@ def get_dependencies_from_bodies(bodies, root_id):
     for body in bodies:
         deps = extract_dependency_id(body)
         if deps:
-            deps = filter(lambda dependency_id: dependency_id != root_id, deps)
+            deps = [dependency_id for dependency_id in deps if dependency_id != root_id]
             dependencies.extend(deps)
 
     return list(set(dependencies))
