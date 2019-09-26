@@ -867,12 +867,12 @@ ISSUE_DETAIL = '''
   },
   "labels": [
     {
-      'id': 1579918050,
-      'node_id': 'MDU6TGFiZWwxNTc5OTE4MDUw',
-      'url': 'https://api.github.com/repos/alvarocavalcanti/pierre-decheck/labels/dependencies',
-      'name': 'LABEL_NAME',
-      'color': '0366d6',
-      'default': False
+      "id": 1579918050,
+      "node_id": "MDU6TGFiZWwxNTc5OTE4MDUw",
+      "url": "https://api.github.com/repos/alvarocavalcanti/pierre-decheck/labels/dependencies",
+      "name": "LABEL_NAME",
+      "color": "0366d6",
+      "default": False
     }
   ],
   "assignee": {
