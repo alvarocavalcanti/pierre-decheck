@@ -872,7 +872,7 @@ ISSUE_DETAIL = '''
       "url": "https://api.github.com/repos/alvarocavalcanti/pierre-decheck/labels/dependencies",
       "name": "LABEL_NAME",
       "color": "0366d6",
-      "default": False
+      "default": false
     }
   ],
   "assignee": {
