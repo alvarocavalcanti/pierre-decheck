@@ -37,6 +37,26 @@ Usually when one has external dependencies (other repos) these dependencies requ
 
 ![Pull Request Checks Exemple](pull_request_checks_release_label.png)
 
+# Contributing
+
+[TBD]
+
+## Architecture
+
+[TBD]
+
+## Code Style
+
+[TBD] Readability over code comments, DAMP vs. DRY
+
+## Recommended IDEs
+
+[TBD]
+
+## GitHub Contribution Flow
+
+[TBD]
+
 ## References
 
 1. [Github Repo Statuses](https://developer.github.com/v3/repos/statuses/#create-a-status)
