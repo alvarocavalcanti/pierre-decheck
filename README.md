@@ -4,6 +4,8 @@
 
 ## Key Features
 
+THIS IS A FOO-BAR
+
 It checks for pull requests dependencies, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
 
 * Same repo: Depends on #1
