@@ -18,9 +18,8 @@ HEADERS = {'Authorization': 'Token {}'.format(os.getenv("GITHUB_TOKEN", ""))}
 GITHUB_SECRET = os.getenv("GITHUB_SECRET", "").encode('utf-8')
 USE_GITHUB_SECRET = os.getenv("USE_GITHUB_SECRET", False)
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
 
 def check(payload, headers, host):
     verification, reply = verify_source_is_github(payload, headers)
