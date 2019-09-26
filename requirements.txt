@@ -1,4 +1,4 @@
-flask==0.12.2
+flask==1.0
 Flask-API==1.1b1
 Markdown==2.6.11
 flake8
