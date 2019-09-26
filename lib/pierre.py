@@ -50,6 +50,7 @@ def check(payload, headers, host):
             if state in ["open", "closed_not_released"]:
                 are_dependencies_met = False
 
+        logger.info("Updating commit status...")
         update_commit_status(
             owner=owner,
             repo=repo,
@@ -99,6 +100,7 @@ def get_all_bodies(data):
     bodies = []
     bodies.extend(bodies_from_event)
     bodies.extend(bodies_from_comments)
+    logger.info(f"Bodies: {bodies}")
     return bodies
 
 
@@ -152,6 +154,7 @@ def get_bodies(event_object):
 
 
 def get_pull_request_id(event):
+    logger.info(f'Pull Request ID: {event.get("issue", {}).get("number", "")}')
     return event.get("issue", {}).get("number", "")
 
 
@@ -163,12 +166,14 @@ def get_dependencies_from_bodies(bodies, root_id):
             deps = [dependency_id for dependency_id in deps if dependency_id != root_id]
             dependencies.extend(deps)
 
+    logger.info(f"Dependencies: {list(set(dependencies))}")
     return list(set(dependencies))
 
 
 def get_owner_and_repo(event):
     repo = event.get("repository", {}).get("name", "")
     owner = event.get("repository", {}).get("owner", {}).get("login", "")
+    logger.info(f"Repo: {repo}, Owner: {owner}")
 
     return owner, repo
 
@@ -215,7 +220,9 @@ def get_dependency_state(dependency_id, owner, repo):
         repo,
         dependency_id
     )
+    logger.info(f"URL for Dependency: {url}")
     response = requests.request('GET', url, headers=HEADERS)
+    logger.info(f"Dependency Resquest OK? {response.status_code} {response.text}")
     if response.status_code == HTTP_200_OK:
         state = json.loads(response.text).get('state', None)
         if state and state == "closed":
