@@ -21,6 +21,7 @@ USE_GITHUB_SECRET = os.getenv("USE_GITHUB_SECRET", False)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
+
 def check(payload, headers, host):
     verification, reply = verify_source_is_github(payload, headers)
     if not verification:
