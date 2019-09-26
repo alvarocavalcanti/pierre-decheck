@@ -4,6 +4,9 @@ from flask import request
 from flask_api import FlaskAPI, status
 from lib.pierre import check
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 app = FlaskAPI(__name__)
 
 
