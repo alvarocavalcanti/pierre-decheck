@@ -867,13 +867,12 @@ ISSUE_DETAIL = '''
   },
   "labels": [
     {
-      "id": 208045946,
-      "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
-      "url": "https://api.github.com/repos/octocat/Hello-World/labels/bug",
-      "name": "bug",
-      "description": "LABEL_DESCRIPTION",
-      "color": "f29513",
-      "default": true
+      'id': 1579918050,
+      'node_id': 'MDU6TGFiZWwxNTc5OTE4MDUw',
+      'url': 'https://api.github.com/repos/alvarocavalcanti/pierre-decheck/labels/dependencies',
+      'name': 'LABEL_NAME',
+      'color': '0366d6',
+      'default': False
     }
   ],
   "assignee": {

@@ -168,7 +168,7 @@ class TestPierre(object):
         request_response = Mock()
         request_response.status_code = HTTP_200_OK
         issue_detail = ISSUE_DETAIL.replace("ISSUE_STATUS", "closed")
-        issue_detail = issue_detail.replace("LABEL_DESCRIPTION", "RELEASED")
+        issue_detail = issue_detail.replace("LABEL_NAME", "RELEASED")
         request_response.text = issue_detail
 
         mock_request.return_value = request_response
