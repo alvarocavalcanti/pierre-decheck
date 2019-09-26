@@ -1,3 +1,5 @@
+import logging
+
 from flask import request
 from flask_api import FlaskAPI, status
 from lib.pierre import check
