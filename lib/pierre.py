@@ -206,7 +206,7 @@ def get_external_owner_and_repo(dependency_id):
 
 def issue_has_release_label(issue, label):
     labels = json.loads(issue).get('labels', [])
-    labels_descriptions = [label.get("description", "").lower() for label in labels]
+    labels_descriptions = [label.get("name", "").lower() for label in labels]
     logging.info(f"Release Label: {label} - PR Labels: {labels}")
     return label in labels_descriptions
 
