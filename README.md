@@ -1,7 +1,8 @@
-Continuous-Integration: [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
+# Pierre DeCheck - A Pull-Request Dependency Checker
 
-# Pierre DeCheck
-Pull Request Dependency Check.
+[![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
+
+## Key Features
 
 It checks for pull requests dependencies, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
 
@@ -12,7 +13,7 @@ Pierre will perform checks only upon PR creation and Comment Activity (added/rem
 
 For now, the best way of re-checkind the dependencies statuses is to add a new comment. I suggest `pierre re-check`. :smiley:
 
-# Installation
+## Installation
 
 1. Checkout/download this repo
 1. Publish the app wherever suits you the best (it has both [Heroku](http://www.heroku.com) and [AWS Lambda](https://aws.amazon.com/lambda/) configuration in place) and take note of the app's URL
@@ -24,13 +25,17 @@ For now, the best way of re-checkind the dependencies statuses is to add a new c
 1. [Create an access token for your repo](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) and grant it with either `repo:status` for _Public_ repos or `repo (Full control of private repositories)` for _Private_ repos.
 1. Add the token as an environment variable for you app, labeled `GITHUB_TOKEN`
 
-# Usage
+## Usage
 
 1. Create a pull request on the repository that has *pierre* set up
-1. Add the keywords `Depends on #` (for same-repo) or "Depends on `owner/repo#`" (for external) followed by an issue/pull request number, `Depends on #2` or `Depends on owner/repo#2`, to the pull request description, or later, as a comment
-![Pull Request Checks Example](pull_request_keywords.png)
-1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section:
-![Pull Request Checks Example](pull_request_checks.png)
+1. Add the keywords `Depends on #` (for same-repo) or "Depends on `owner/repo#`" (for external) followed by an issue/pull request number, `Depends on #2` or `Depends on owner/repo#2`, to the pull request description, or later, as a comment ![Pull Request Checks Example](pull_request_keywords.png)
+1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section: ![Pull Request Checks Example](pull_request_checks.png)
+
+### Optional feature: Depending on a Released PR
+
+Usually when one has external dependencies (other repos) these dependencies requires not only a PR to be merged, but also released. To that extent, _Pierre_ offers an optional configuration: by setting the environment variable `RELEASE_LABEL` to any given value, _Pierre_ will then consider any dependency as met only if its state is `closed` and if it also has the proper label. On the screenshot below it's possible to see how it looks like when the dependency is closed but does not have the release label:
+
+![Pull Request Checks Exemple](pull_request_checks_release_label.png)
 
 # Contributing
 

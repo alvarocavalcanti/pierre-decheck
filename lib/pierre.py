@@ -47,7 +47,7 @@ def check(payload, headers, host):
         sha = get_sha(payload)
         are_dependencies_met = True
         for dep, state in dependencies_and_states:
-            if state == "open":
+            if state in ["open", "closed_not_released"]:
                 are_dependencies_met = False
 
         update_commit_status(
@@ -199,10 +199,10 @@ def get_external_owner_and_repo(dependency_id):
         return owner, repo, dependency_id
 
 
-def issue_does_not_have_release_label(issue, label):
+def issue_has_release_label(issue, label):
     labels = json.loads(issue).get('labels', [])
     labels_descriptions = [label.get("description", "") for label in labels]
-    return label not in labels_descriptions
+    return label in labels_descriptions
 
 
 def get_dependency_state(dependency_id, owner, repo):
@@ -220,8 +220,8 @@ def get_dependency_state(dependency_id, owner, repo):
         state = json.loads(response.text).get('state', None)
         if state and state == "closed":
             release_label = os.getenv("RELEASE_LABEL", None)
-            if release_label and issue_does_not_have_release_label(issue=response.text, label=release_label):
-                return "open"
+            if release_label and not issue_has_release_label(issue=response.text, label=release_label):
+                return "closed_not_released"
         return state
     return None
 
