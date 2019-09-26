@@ -206,7 +206,7 @@ def get_external_owner_and_repo(dependency_id):
 
 def issue_has_release_label(issue, label):
     labels = json.loads(issue).get('labels', [])
-    labels_descriptions = [label.get("description", "") for label in labels]
+    labels_descriptions = [label.get("description", "").lower() for label in labels]
     return label in labels_descriptions
 
 
@@ -227,7 +227,7 @@ def get_dependency_state(dependency_id, owner, repo):
         state = json.loads(response.text).get('state', None)
         if state and state == "closed":
             release_label = os.getenv("RELEASE_LABEL", None)
-            if release_label and not issue_has_release_label(issue=response.text, label=release_label):
+            if release_label and not issue_has_release_label(issue=response.text, label=release_label.lower()):
                 return "closed_not_released"
         return state
     return None
