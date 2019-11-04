@@ -37,9 +37,9 @@ Usually when one has external dependencies (other repos) these dependencies requ
 
 ![Pull Request Checks Exemple](pull_request_checks_release_label.png)
 
-# Contributing
+## Contributing
 
-[TBD]
+[Contributing document](docs/contributing.md)
 
 ## Architecture
 
@@ -50,10 +50,6 @@ Usually when one has external dependencies (other repos) these dependencies requ
 [TBD] Readability over code comments, DAMP vs. DRY
 
 ## Recommended IDEs
-
-[TBD]
-
-## GitHub Contribution Flow
 
 [TBD]
 
