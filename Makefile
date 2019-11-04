@@ -12,6 +12,6 @@ create-env: ## Creates the virtual environment folder
 flake8: ## Linting/static checks
 	flake8 .
 setup: ## Installs the dependencies
-	pip install -r requirements.txt || pip3 install -r requirements
+	pip install -r requirements.txt || pip3 install -r requirements.txt
 test: setup ## Runs all the tests
 	python3 -m unittest tests.test_server.ServerTest
