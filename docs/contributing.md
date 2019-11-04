@@ -18,6 +18,7 @@ If you are interested in contributing, please follow these guidelines:
   * If the work is a refactoring, make sure the existing tests do not break
   * To run the tests locally: `make test`
 * Mind the [Code Style](code_style.md)
+* **Don't** force push! Fix your merge conflicts and respect commit history. Also, be mindful of cleaning up/squashing smaller commits
 * Push your changes to your fork and then [create a new pull request](compare/)
   * Keep an eye on Pierre's [Continuos Integration](https://circleci.com/gh/alvarocavalcanti/pierre-decheck) panel, if it fails, fix it
 
