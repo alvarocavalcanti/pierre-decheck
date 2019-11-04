@@ -39,19 +39,16 @@ Usually when one has external dependencies (other repos) these dependencies requ
 
 ## Contributing
 
-[Contributing document](docs/contributing.md)
-
-## Architecture
-
-[TBD]
+[Contributing document](docs/contributing.md).
 
 ## Code Style
 
-[TBD] Readability over code comments, DAMP vs. DRY
+[Code style document](docs/code_style.md).
 
 ## Recommended IDEs
 
-[TBD]
+1. [PyCharm](https://www.jetbrains.com/pycharm/) - Community edition is free and decent, Professional edition is awesome
+1. [VisualStudio Code](https://code.visualstudio.com/) - Completely free, large amount of extensions and great community support
 
 ## References
 

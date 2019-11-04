@@ -1,5 +1,11 @@
 # Contributing
 
+## Architecture
+
+Pierre is built primarly using [Flask](https://www.fullstackpython.com/flask.html), which can be seen on the [`servcer.py`](../server.py) file. The file servers as its standard entry point, but there's also support for [serverless](https://serverless.com/) via the [`serverless.yml`](../serverless.yml) file.
+
+The main implementation resides in [`pierre.py`](../lib/pierre.py).
+
 ## Workflow
 
 If you are interested in contributing, please follow these guidelines:
@@ -11,6 +17,7 @@ If you are interested in contributing, please follow these guidelines:
   * If the work adds new requirements, write tests for them and make sure the existing ones do not break
   * If the work is a refactoring, make sure the existing tests do not break
   * To run the tests locally: `make test`
+* Mind the [Code Style](code_style.md)
 * Push your changes to your fork and then [create a new pull request](compare/)
   * Keep an eye on Pierre's [Continuos Integration](https://circleci.com/gh/alvarocavalcanti/pierre-decheck) panel, if it fails, fix it
 
