@@ -122,6 +122,8 @@ def get_sha(data):
         sorted_commits = sorted(commits, key=lambda x: datetime.datetime.strptime(
             x['commit']['author']['date'], '%Y-%m-%dT%H:%M:%SZ'), reverse=True)
         return sorted_commits[0].get("sha", None)
+    else:
+        logger.info("Failed to retrieve SHA information ({}) for {}".format(response.status_code, commits_url))
     return None
 
 
@@ -138,6 +140,8 @@ def get_bodies_from_pr_comments(event_data):
     if response.status_code == HTTP_200_OK:
         comments = json.loads(response.text)
         return [comment.get("body") for comment in comments]
+    else:
+        logger.info("Failed to retrieve comments information ({}) for {}".format(response.status_code, comments_url))
 
     return []
 
@@ -223,7 +227,6 @@ def get_dependency_state(dependency_id, owner, repo):
     )
     logger.info(f"URL for Dependency: {url}")
     response = requests.request('GET', url, headers=HEADERS)
-    logger.info(f"Dependency Resquest OK? {response.status_code} {response.text}")
     if response.status_code == HTTP_200_OK:
         state = json.loads(response.text).get('state', None)
         if state and state == "closed":
@@ -231,6 +234,8 @@ def get_dependency_state(dependency_id, owner, repo):
             if release_label and not issue_has_release_label(issue=response.text, label=release_label.lower()):
                 return "closed_not_released"
         return state
+    else:
+        logger.info("Failed to retrieve dependency information ({}) for {}".format(response.status_code, url))
     return None
 
 
