@@ -1,0 +1,24 @@
+FROM python:3.7
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /pierre-decheck
+
+# Install required python packages
+COPY requirements.txt /pierre-decheck/
+RUN pip install -r requirements.txt
+
+# And the dev dependencies
+COPY requirements-dev.txt /pierre-decheck/
+RUN pip install -r requirements-dev.txt
+
+# Setup SSH with secure root login
+RUN apt-get update \
+ && apt-get install -y openssh-server netcat \
+ && mkdir /var/run/sshd \
+ && echo 'root:password' | chpasswd \
+ && sed -i 's/\#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+COPY docker/bashrc.dev /root/.bashrc
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

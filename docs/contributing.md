@@ -27,3 +27,21 @@ If you are interested in contributing, please follow these guidelines:
 
 * As a Python project, Pierre's makes use of the widely used standard of `virtual-env`
 * There is a [`Makefile`](../Makefile) with several helpful targets, have a look at them with `make help`
+
+## Recommended Development Environment - PyCharm Professional Edition with Remote Interpreter
+
+Pierre provides a Docker "sidecar" that exposes a Python interpreter via SSH, and thus can be used as a remote interpreter by PyCharm. This approach is an improvement on the "virtualenv" pattern, in which instead of having to create a local environment, the developer can rely on the sidecar's environment.
+
+Here's the steps for setting it up:
+
+1. Build the images: `make build`
+1. Bring the containers up: `make up` - they'l be executed in the background
+1. In PyCharm > Preferences (CMD + ,) > Project Settings > Project Interpreter
+1. Click on the gear icon next to the "Project Interpreter" dropdown > Add
+1. Select "SSH Interpreter" > Host: localhost, Port: 9922, Username: root > Password: password > Interpreter: /usr/local/bin/python, Sync folders: Preoject Root -> /pierre-decheck, Disable "Automatically upload..."
+
+### Perks
+
+1. Seamless class discovery and navigation
+1. Import suggestions and organize imports
+1. Running tests directly from the IDE
