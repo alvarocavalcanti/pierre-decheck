@@ -24,7 +24,7 @@ GITHUB_HEADERS = {
     "User-Agent": "GitHub-Foo"
 }
 
-HOST = "infinite-harbor-38537.herokuapp.com"
+HOST = "pierre-de-check.herokuapp.com"
 
 
 class TestPierre(object):
