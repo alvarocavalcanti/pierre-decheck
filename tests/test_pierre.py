@@ -87,9 +87,9 @@ class TestPierre(PierreTestCase):
     def test_get_external_owner_and_repo(self):
         owner, repo, dependency_id = get_external_owner_and_repo("alvarocavalcanti/my-dev-templates#1")
 
-        self.assertEqual("alvarocavalcanti",owner)
-        self.assertEqual("my-dev-templates",repo)
-        self.assertEqual("1",dependency_id)
+        self.assertEqual("alvarocavalcanti", owner)
+        self.assertEqual("my-dev-templates", repo)
+        self.assertEqual("1", dependency_id)
 
     def test_get_owner_and_repo_from_pr_comment_event(self):
         owner, repo = get_owner_and_repo(json.loads(PR_COMMENT_EVENT))
@@ -109,7 +109,7 @@ class TestPierre(PierreTestCase):
 
         response = check(payload, headers=GITHUB_HEADERS, host=HOST)
 
-        self.assertEqual(201,response.get("statusCode"))
+        self.assertEqual(201, response.get("statusCode"))
 
         expected_url = "{}repos/{}/{}/issues/{}".format(
             BASE_GITHUB_URL,

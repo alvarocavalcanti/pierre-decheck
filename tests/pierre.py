@@ -17,7 +17,7 @@ class PierreTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         logging.disable(logging.CRITICAL)
-    
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
