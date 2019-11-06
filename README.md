@@ -1,10 +1,10 @@
-# Pierre DeCheck - A Pull-Request Dependency Checker
+# Pierre DeCheck - A Dependant Pull-Request Checker
 
 [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
 ## Key Features
 
-It checks for pull requests dependencies, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
+It checks for  dependant pull requests, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
 
 * Same repo: Depends on #1
 * External: Depends on alvarocavalcanti/pierre-decheck#1
