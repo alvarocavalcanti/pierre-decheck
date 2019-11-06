@@ -1,6 +1,7 @@
-import os
-
 import json
+import os
+from unittest.mock import patch, Mock
+
 from flask_api.status import HTTP_200_OK
 
 from lib.payloads import PR_COMMENT_EVENT, PR_CREATED, ISSUE_DETAIL
@@ -15,8 +16,7 @@ from lib.pierre import (
     HEADERS,
     get_dependency_state,
 )
-
-from mock import patch, Mock
+from tests.pierre import PierreTestCase
 
 GITHUB_HEADERS = {
     "X-GitHub-Event": "issue_comment",
@@ -27,20 +27,20 @@ GITHUB_HEADERS = {
 HOST = "infinite-harbor-38537.herokuapp.com"
 
 
-class TestPierre(object):
+class TestPierre(PierreTestCase):
 
     def test_get_bodies_from_pr_comment_event(self):
         bodies = get_bodies(json.loads(PR_COMMENT_EVENT))
 
-        assert 2 == len(bodies)
-        assert "This is the PR body" == bodies[0]
-        assert "this is a comment" == bodies[1]
+        self.assertEqual(2, len(bodies))
+        self.assertEqual("This is the PR body", bodies[0])
+        self.assertEqual("this is a comment", bodies[1])
 
     def test_get_bodies_from_pr_created_event(self):
         bodies = get_bodies(json.loads(PR_CREATED))
 
-        assert 1 == len(bodies)
-        assert "This is the PR body" == bodies[0]
+        self.assertEqual(1, len(bodies))
+        self.assertEqual("This is the PR body", bodies[0])
 
     def test_get_dependencies_identifiers_from_list(self):
         bodies = ["Depends on #2", "", "depends on #3", "No dependencies here", "depends on #4"]
@@ -48,9 +48,9 @@ class TestPierre(object):
         root_id = '4'
         dependencies = get_dependencies_from_bodies(bodies, root_id)
 
-        assert 2 == len(dependencies)
-        assert "2" in dependencies
-        assert "3" in dependencies
+        self.assertEqual(2, len(dependencies))
+        self.assertIn("2", dependencies)
+        self.assertIn("3", dependencies)
 
     def test_get_dependencies_identifiers_from_single_body(self):
         bodies = ["Depends on #2. Depends on #3"]
@@ -58,9 +58,9 @@ class TestPierre(object):
         root_id = '4'
         dependencies = get_dependencies_from_bodies(bodies, root_id)
 
-        assert 2 == len(dependencies)
-        assert "2" in dependencies
-        assert "3" in dependencies
+        self.assertEqual(2, len(dependencies))
+        self.assertIn("2", dependencies)
+        self.assertIn("3", dependencies)
 
     def test_get_dependencies_removes_duplicates(self):
         bodies = ["Depends on #2", "", "depends on #3", "depends on #3"]
@@ -68,7 +68,7 @@ class TestPierre(object):
         root_id = '4'
         dependencies = get_dependencies_from_bodies(bodies, root_id)
 
-        assert 2 == len(dependencies)
+        self.assertEqual(2, len(dependencies))
 
     def test_get_dependencies_accepts_external_dependencies(self):
         bodies = ["Depends on #2", "", "depends on alvarocavalcanti/my-dev-templates#1"]
@@ -76,32 +76,32 @@ class TestPierre(object):
         root_id = '4'
         dependencies = get_dependencies_from_bodies(bodies, root_id)
 
-        assert 2 == len(dependencies)
-        assert "2" in dependencies
-        assert "alvarocavalcanti/my-dev-templates#1" in dependencies
+        self.assertEqual(2, len(dependencies))
+        self.assertIn("2", dependencies)
+        self.assertIn("alvarocavalcanti/my-dev-templates#1", dependencies)
 
     def test_is_external_dependency(self):
-        assert is_external_dependency("alvarocavalcanti/my-dev-templates#1")
-        assert not is_external_dependency("1")
+        self.assertTrue(is_external_dependency("alvarocavalcanti/my-dev-templates#1"))
+        self.assertFalse(is_external_dependency("1"))
 
     def test_get_external_owner_and_repo(self):
         owner, repo, dependency_id = get_external_owner_and_repo("alvarocavalcanti/my-dev-templates#1")
 
-        assert "alvarocavalcanti" == owner
-        assert "my-dev-templates" == repo
-        assert "1" == dependency_id
+        self.assertEqual("alvarocavalcanti",owner)
+        self.assertEqual("my-dev-templates",repo)
+        self.assertEqual("1",dependency_id)
 
     def test_get_owner_and_repo_from_pr_comment_event(self):
         owner, repo = get_owner_and_repo(json.loads(PR_COMMENT_EVENT))
 
-        assert "alvarocavalcanti" == owner
-        assert "pierre-decheck" == repo
+        self.assertEqual("alvarocavalcanti", owner)
+        self.assertEqual("pierre-decheck", repo)
 
     def test_get_owner_and_repo_from_pr_created_event(self):
         owner, repo = get_owner_and_repo(json.loads(PR_CREATED))
 
-        assert "alvarocavalcanti" == owner
-        assert "pierre-decheck" == repo
+        self.assertEqual("alvarocavalcanti", owner)
+        self.assertEqual("pierre-decheck", repo)
 
     @patch('lib.pierre.requests.request')
     def test_checks_dependencies_upon_receiving_pr_created_event(self, requests_mock):
@@ -109,7 +109,7 @@ class TestPierre(object):
 
         response = check(payload, headers=GITHUB_HEADERS, host=HOST)
 
-        assert 201 == response.get("statusCode")
+        self.assertEqual(201,response.get("statusCode"))
 
         expected_url = "{}repos/{}/{}/issues/{}".format(
             BASE_GITHUB_URL,
@@ -129,7 +129,7 @@ class TestPierre(object):
 
         response = check(payload, headers=GITHUB_HEADERS, host=HOST)
 
-        assert 201 == response.get("statusCode")
+        self.assertEqual(201, response.get("statusCode"))
 
         expected_url_dep_2 = "{}repos/{}/{}/issues/{}".format(
             BASE_GITHUB_URL,
@@ -160,7 +160,7 @@ class TestPierre(object):
 
         issue_state = get_dependency_state("1", "foo", "bar")
 
-        assert "closed_not_released" == issue_state
+        self.assertEqual("closed_not_released", issue_state)
 
     @patch("requests.request")
     @patch.dict(os.environ, {'RELEASE_LABEL': 'RELEASED'})
@@ -175,4 +175,4 @@ class TestPierre(object):
 
         issue_state = get_dependency_state("1", "foo", "bar")
 
-        assert "closed" == issue_state
+        self.assertEqual("closed", issue_state)

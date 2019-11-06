@@ -3,28 +3,19 @@ import unittest
 from unittest.mock import patch
 
 from flask_api import status
-from flask_testing import TestCase
 
-
-import server
-from lib.payloads import PR_COMMENT_EVENT, PR_CREATED
 from lib import pierre
+from lib.payloads import PR_COMMENT_EVENT, PR_CREATED
 from lib.pierre import HEADERS as request_headers
+from tests.pierre import PierreTestCase
 
 
-class ServerTest(TestCase):
-    render_templates = False
-
+class ServerTest(PierreTestCase):
     GITHUB_HEADERS = {
         "X-GitHub-Event": "issue_comment",
         "X-GitHub-Delivery": "foo",
         "User-Agent": "GitHub-Foo"
     }
-
-    def create_app(self):
-        app = server.app
-        app.config['TESTING'] = True
-        return app
 
     def test_server_is_up(self):
         response = self.client.get("/")
