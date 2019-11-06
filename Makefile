@@ -11,13 +11,12 @@ create-env: ## Creates the virtual environment folder
 	virtualenv env
 
 flake8: ## Linting/static checks
-	flake8 .
+	docker-compose run --rm dev bash -c "flake8 ."
 
-setup: ## Installs the dependencies
-	pip install -r requirements.txt || pip3 install -r requirements.txt
+setup: ## Installs the dependencies on the dev sidecar
+	docker-compose run --rm dev bash -c "pip install -r requirements.txt"
 
-test: setup ## Runs all the tests
-	python3 -m unittest tests.test_server.ServerTest
+test: setup unittest flake8 ## Runs all the tests
 
 build: ## Build all the docker images
 	docker-compose build
@@ -39,3 +38,6 @@ shell-app: ## Start a shell on the app container
 
 clean: down ## Delete local data and ensure containers are stopped
 	rm -rf ./.compose-data
+
+unittest: build ## Just run unit tests (skip lints)
+	docker-compose run --rm dev bash -c "./bin/test.sh"
