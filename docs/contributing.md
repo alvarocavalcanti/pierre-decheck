@@ -28,20 +28,52 @@ If you are interested in contributing, please follow these guidelines:
 * As a Python project, Pierre's makes use of the widely used standard of `virtual-env`
 * There is a [`Makefile`](../Makefile) with several helpful targets, have a look at them with `make help`
 
-## Recommended Development Environment - PyCharm Professional Edition with Remote Interpreter
+## Recommended Development Environment - Docker sidecar
 
-Pierre provides a Docker "sidecar" that exposes a Python interpreter via SSH, and thus can be used as a remote interpreter by PyCharm. This approach is an improvement on the "virtualenv" pattern, in which instead of having to create a local environment, the developer can rely on the sidecar's environment.
+Pierre's `docker-compose.yaml` specifies a "sidecar" container that can be used by IDEs to execute the remote interpreter, and that provides some perks, such as:
 
-Here's the steps for setting it up:
+1. No hassle dev environment configuration
+1. Standardized dev environment across the team
+1. Seamless class discovery and navigation
+1. Import suggestions and organize imports
+1. Running tests directly from the IDE
+
+The sidecar is exposed via SSH and this pattern can be seen as an improvement of the virtual environment pattern (implemented by tools such as `virtualenv` and `pyenv`).
+
+Before trying to configure your IDE:
 
 1. Build the images: `make build`
 1. Bring the containers up: `make up` - they'l be executed in the background
+
+### PyCharm Professional Edition
+
 1. In PyCharm > Preferences (CMD + ,) > Project Settings > Project Interpreter
 1. Click on the gear icon next to the "Project Interpreter" dropdown > Add
 1. Select "SSH Interpreter" > Host: localhost, Port: 9922, Username: root > Password: password > Interpreter: /usr/local/bin/python, Sync folders: Preoject Root -> /pierre-decheck, Disable "Automatically upload..."
 
-### Perks
+Expected results:
 
-1. Seamless class discovery and navigation
-1. Import suggestions and organize imports
-1. Running tests directly from the IDE
+1. Code completion works
+1. Code navigation works
+1. Organize imports works
+1. Import suggestions/discovery works
+1. Tests (either classes or methods) can be executed by placing the cursor on them and then using `Ctrl+Shift+R`
+
+### Visual Studio Code
+
+1. Install the [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) extension
+1. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+1. Open the Command Pallette and type `Remote-Containers`, then select the `Attach to Running Container...` and selecet `pierre-decheck_dev_1` (or similar)
+1. VS Code will restart and reload
+1. On the `Explorer` sidebar, click the `open a folder` button and then enter `/pierre-decheck` (this will be loaded from the remote container)
+1. On the `Extensions` sidebar, select the `Python` extension and install it on the container
+1. When prompet on which interppreter to use, select `/usr/local/bin/python`
+1. Open the Command Pallette and type `Python: Configure Tests`, then select `unittest` framework
+
+Expected results:
+
+1. Code completion works
+1. Code navigation works
+1. Organize imports works
+1. Import suggestions/discovery works
+1. Tests (either classes or methods) will have a new line above their definitions, containing two actions: `Run Test | Debug Test`, and will be executed upon clicking on them
