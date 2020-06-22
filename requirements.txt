@@ -5,3 +5,5 @@ flake8
 Flask-Testing==0.7.1
 gunicorn==19.6.0
 requests==2.20.0
+# pin to 0.16.1 as a workaround for https://github.com/jarus/flask-testing/issues/143
+Werkzeug==0.16.1

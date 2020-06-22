@@ -1,0 +1,28 @@
+version: '3.3'
+
+services:
+  app:
+    image: pierre-decheck${IMAGE_TAG:-:latest}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - .:/pierre-decheck/
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DEV: 'True'
+    env_file: local.env
+
+  # This is a development-only sidecar for running tests, etc.
+  dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    ports:
+      - 127.0.0.1:9922:22
+    volumes:
+      - .:/pierre-decheck/
+    environment:
+      DEV: 'True'
+    env_file: local.env

@@ -16,7 +16,6 @@ def root_list():
 
 @app.route("/webhook", methods=['POST'])
 def webhook_event():
-
     app.logger.info("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
     result = check(request.data, request.headers, request.environ.get("HTTP_HOST"))
     return result.get("body"), result.get("statusCode")

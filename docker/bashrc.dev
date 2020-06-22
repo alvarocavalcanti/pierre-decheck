@@ -1,0 +1,2 @@
+# Note:  SSH wipes ENV variables, so we need to add these outside
+#        of docker-compose

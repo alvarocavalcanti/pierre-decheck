@@ -1,10 +1,10 @@
-# Pierre DeCheck - A Pull-Request Dependency Checker
+# Pierre DeCheck - A Dependent Pull-Request Checker
 
 [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
 ## Key Features
 
-It checks for pull requests dependencies, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
+It checks for  dependant pull requests, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
 
 * Same repo: Depends on #1
 * External: Depends on alvarocavalcanti/pierre-decheck#1
@@ -28,34 +28,27 @@ For now, the best way of re-checkind the dependencies statuses is to add a new c
 ## Usage
 
 1. Create a pull request on the repository that has *pierre* set up
-1. Add the keywords `Depends on #` (for same-repo) or "Depends on `owner/repo#`" (for external) followed by an issue/pull request number, `Depends on #2` or `Depends on owner/repo#2`, to the pull request description, or later, as a comment ![Pull Request Checks Example](pull_request_keywords.png)
-1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section: ![Pull Request Checks Example](pull_request_checks.png)
+1. Add the keywords `Depends on #` (for same-repo) or "Depends on `owner/repo#`" (for external) followed by an issue/pull request number, `Depends on #2` or `Depends on owner/repo#2`, to the pull request description, or later, as a comment ![Pull Request Checks Example](docs/images/pull_request_keywords.png)
+1. Every time a comment is added or deleted, *pierre* will check the dependencies and update the "Checks" section: ![Pull Request Checks Example](docs/images/pull_request_checks.png)
 
 ### Optional feature: Depending on a Released PR
 
 Usually when one has external dependencies (other repos) these dependencies requires not only a PR to be merged, but also released. To that extent, _Pierre_ offers an optional configuration: by setting the environment variable `RELEASE_LABEL` to any given value, _Pierre_ will then consider any dependency as met only if its state is `closed` and if it also has the proper label. On the screenshot below it's possible to see how it looks like when the dependency is closed but does not have the release label:
 
-![Pull Request Checks Exemple](pull_request_checks_release_label.png)
+![Pull Request Checks Exemple](docs/images/pull_request_checks_release_label.png)
 
-# Contributing
+## Contributing
 
-[TBD]
-
-## Architecture
-
-[TBD]
+[Contributing document](docs/contributing.md).
 
 ## Code Style
 
-[TBD] Readability over code comments, DAMP vs. DRY
+[Code style document](docs/code_style.md).
 
 ## Recommended IDEs
 
-[TBD]
-
-## GitHub Contribution Flow
-
-[TBD]
+1. [PyCharm](https://www.jetbrains.com/pycharm/) - Community edition is free and decent, Professional edition is awesome
+1. [VisualStudio Code](https://code.visualstudio.com/) - Completely free, large amount of extensions and great community support
 
 ## References
 
