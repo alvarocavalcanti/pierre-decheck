@@ -1,4 +1,4 @@
-# Pierre DeCheck - A Dependant Pull-Request Checker
+# Pierre DeCheck - A Dependent Pull-Request Checker
 
 [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
