@@ -2,7 +2,7 @@
 
 ## Architecture
 
-Pierre is built primarly using [Flask](https://www.fullstackpython.com/flask.html), which can be seen on the [`servcer.py`](../server.py) file. The file servers as its standard entry point, but there's also support for [serverless](https://serverless.com/) via the [`serverless.yml`](../serverless.yml) file.
+Pierre is built primarly using [Flask](https://www.fullstackpython.com/flask.html), which can be seen on the [`server.py`](../server.py) file. The file servers as its standard entry point, but there's also support for [serverless](https://serverless.com/) via the [`serverless.yml`](../serverless.yml) file.
 
 The main implementation resides in [`pierre.py`](../lib/pierre.py).
 
@@ -10,7 +10,7 @@ The main implementation resides in [`pierre.py`](../lib/pierre.py).
 
 If you are interested in contributing, please follow these guidelines:
 
-* Have a look at the [open issues](issues/) and make sure there's an issue for the work you want to do. Create one if there isn't
+* Have a look at the [open issues](https://github.com/alvarocavalcanti/pierre-decheck/issues) and make sure there's an issue for the work you want to do. Create one if there isn't
 * Assign yourself to that issue
 * Fork the repository
 * Create a branch for your work, and name it appropriately: try to be descriptive, avoid acronyms and abbreviations. If possible use one of the following templates: `ISSUE-25-details-endpoint-for-external-dependencies` or just `ISSUE-25`
@@ -20,8 +20,8 @@ If you are interested in contributing, please follow these guidelines:
   * To run the tests locally: `make test`
 * Mind the [Code Style](code_style.md)
 * **Don't** force push! Fix your merge conflicts and respect commit history. Also, be mindful of cleaning up/squashing smaller commits
-* Push your changes to your fork and then [create a new pull request](compare/)
-  * Keep an eye on Pierre's [Continuos Integration](https://circleci.com/gh/alvarocavalcanti/pierre-decheck) panel, if it fails, fix it
+* Push your changes to your fork and then [create a new pull request](https://github.com/alvarocavalcanti/pierre-decheck/compare)
+  * Keep an eye on Pierre's [Continuous Integration](https://circleci.com/gh/alvarocavalcanti/pierre-decheck) panel, if it fails, fix it
 
 ## Development Environment
 
