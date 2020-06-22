@@ -5,7 +5,6 @@ import logging
 import hmac
 import hashlib
 import urllib.parse
-import datetime
 from flask_api.status import HTTP_200_OK
 
 STATUS_FAILURE = 'failure'
@@ -112,25 +111,25 @@ def get_all_bodies(data):
 
 
 def get_sha(data):
-    try:
-        pr_url = data.get("pull_request").get("url")
-    except AttributeError:
-        try:
-            pr_url = data.get("issue").get("pull_request").get("url")
-        except AttributeError:
-            pr_url = data.get("issue").get("url")
+    if "pull_request" in data:
+        pr = data.get("pull_request")
+    elif "issue" in data:
+        pr = data.get("issue").get("pull_request")
+    else:
+        return None
 
-    commits_url = "{}/commits".format(pr_url)
-    response = requests.request('GET', commits_url, headers=HEADERS)
+    if "head" in pr:
+        return pr.get("head").get("sha")
+
+    pr_url = pr.get("url")
+    response = requests.request('GET', pr_url, headers=HEADERS)
 
     if response.status_code == HTTP_200_OK:
-        logger.info("SHA list: " + response.text)
-        commits = json.loads(response.text)
-        sorted_commits = sorted(commits, key=lambda x: datetime.datetime.strptime(
-            x['commit']['author']['date'], '%Y-%m-%dT%H:%M:%SZ'), reverse=True)
-        return sorted_commits[0].get("sha", None)
+        logger.info("Pull Request detail: " + response.text)
+        pr = json.loads(response.text)
+        return pr.get("head", {}).get("sha", None)
     else:
-        logger.info("Failed to retrieve SHA information ({}) for {}".format(response.status_code, commits_url))
+        logger.info("Failed to retrieve SHA information ({}) for {}".format(response.status_code, pr_url))
     return None
 
 
