@@ -185,7 +185,10 @@ def get_owner_and_repo(event):
 def extract_dependency_id(comment_body):
     import re
     comment_body = comment_body.lower()
-    regex = r"{}(?:https\:\/\/github\.com\/)?([A-Za-z0-9-_]+\/[A-Za-z0-9-_]+)?(?:\#|\/issues\/|\/pull\/)(\d+)".format("depends on ")
+    regex = (
+        r"{}(?:https\:\/\/github\.com\/)?([A-Za-z0-9-_]+\/[A-Za-z0-9-_]+)?(?:\#|\/issues\/|\/pull\/)(\d+)"
+        .format("depends on ")
+    )
     match = re.findall(regex, comment_body)
     if match:
         items = []

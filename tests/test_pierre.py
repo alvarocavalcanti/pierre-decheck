@@ -153,7 +153,10 @@ class TestPierre(PierreTestCase):
             self, requests_mock
     ):
         payload = PR_COMMENT_EVENT.replace("This is the PR body", "Depends on owner/repo#2.")
-        payload = json.loads(payload.replace("this is a comment", "Depends on https://github.com/owner/repo/pull/3. Depends on https://github.com/owner/repo/issues/4"))
+        payload = json.loads(payload.replace("this is a comment", (
+            "Depends on https://github.com/owner/repo/pull/3."
+            "Depends on https://github.com/owner/repo/issues/4."
+        )))
 
         response = check(payload, headers=GITHUB_HEADERS, host=HOST)
 
