@@ -148,6 +148,42 @@ class TestPierre(PierreTestCase):
         requests_mock.assert_any_call('GET', expected_url_dep_2, headers=HEADERS)
         requests_mock.assert_any_call('GET', expected_url_dep_3, headers=HEADERS)
 
+    @patch('lib.pierre.requests.request')
+    def test_checks_dependencies_upon_receiving_pr_comment_event_for_more_than_one_dependency_on_external_repo(
+            self, requests_mock
+    ):
+        payload = PR_COMMENT_EVENT.replace("This is the PR body", "Depends on owner/repo#2.")
+        payload = json.loads(payload.replace("this is a comment", "Depends on https://github.com/owner/repo/pull/3. Depends on https://github.com/owner/repo/issues/4"))
+
+        response = check(payload, headers=GITHUB_HEADERS, host=HOST)
+
+        self.assertEqual(201, response.get("statusCode"))
+
+        expected_url_dep_2 = "{}repos/{}/{}/issues/{}".format(
+            BASE_GITHUB_URL,
+            "owner",
+            "repo",
+            "2"
+        )
+
+        expected_url_dep_3 = "{}repos/{}/{}/issues/{}".format(
+            BASE_GITHUB_URL,
+            "owner",
+            "repo",
+            "3"
+        )
+
+        expected_url_dep_4 = "{}repos/{}/{}/issues/{}".format(
+            BASE_GITHUB_URL,
+            "owner",
+            "repo",
+            "4"
+        )
+
+        requests_mock.assert_any_call('GET', expected_url_dep_2, headers=HEADERS)
+        requests_mock.assert_any_call('GET', expected_url_dep_3, headers=HEADERS)
+        requests_mock.assert_any_call('GET', expected_url_dep_4, headers=HEADERS)
+
     @patch("requests.request")
     @patch.dict(os.environ, {'RELEASE_LABEL': 'RELEASED'})
     def test_gets_dependency_state_as_open_when_issue_is_closed_but_has_not_been_released(self, mock_request):
