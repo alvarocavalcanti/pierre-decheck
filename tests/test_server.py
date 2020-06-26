@@ -5,7 +5,7 @@ from unittest.mock import patch
 from flask_api import status
 
 from lib import pierre
-from lib.payloads import PR_COMMENT_EVENT, PR_CREATED
+from lib.payloads import PR_COMMENT_EVENT, PR_CREATED, ISSUE_COMMENT_EVENT
 from lib.pierre import HEADERS as request_headers
 from tests.pierre import PierreTestCase
 
@@ -186,6 +186,20 @@ class ServerTest(PierreTestCase):
 
         requests_mock.assert_any_call('GET', expected_url_dep_2, headers=request_headers)
         requests_mock.assert_any_call('GET', expected_url_dep_3, headers=request_headers)
+
+    @patch('lib.pierre.requests.request')
+    def test_skip_check_dependencies_upon_receiving_issue_comment_event(
+            self, requests_mock
+    ):
+        payload = ISSUE_COMMENT_EVENT.replace("This is the PR body", "Depends on #2.")
+        payload = payload.replace("this is a comment", "Depends on #3.")
+
+        response = self.client.post(
+            "/webhook", headers=self.GITHUB_HEADERS, data=payload, content_type='application/json'
+        )
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        requests_mock.assert_not_called()
 
 
 if __name__ == '__main__':

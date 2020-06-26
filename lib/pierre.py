@@ -27,6 +27,9 @@ def check(payload, headers, host):
     if not verification:
         return reply
 
+    if not has_pull_request(payload):
+        return {"statusCode": 201, "body": "Check has skipped because request body does not contain pull_request."}
+
     owner, repo = get_owner_and_repo(payload)
     bodies = get_all_bodies(payload)
     this_pr_id = get_pull_request_id(payload)
@@ -157,9 +160,25 @@ def get_bodies(event_object):
     return bodies
 
 
+def has_pull_request(event):
+    if "pull_request" in event:
+        return True
+    elif "issue" in event:
+        return "pull_request" in event.get("issue")
+    else:
+        return False
+
+
 def get_pull_request_id(event):
-    logger.info(f'Pull Request ID: {event.get("issue", {}).get("number", "")}')
-    return event.get("issue", {}).get("number", "")
+    if "pull_request" in event:
+        pr_id = event.get("pull_request").get("number")
+    elif "issue" in event:
+        pr_id = event.get("issue").get("number")
+    else:
+        return None
+
+    logger.info(f'Pull Request ID: {pr_id}')
+    return pr_id
 
 
 def get_dependencies_from_bodies(bodies, root_id):
