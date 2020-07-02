@@ -319,9 +319,10 @@ def update_dependants(payload, headers, host):
     preview_headers = dict(HEADERS, Accept='application/vnd.github.mockingbird-preview')
     response = requests.request('GET', timeline_url, headers=preview_headers)
     if response.status_code != HTTP_200_OK:
-        logger.info("Failed to retrieve PR timeline for {}".format(timeline_url))
+        logger.info("Failed to retrieve PR timeline for {} : {}".format(timeline_url, response.text))
         return
 
+    logger.info("Timeline response: {}".format(response.text))
     timeline = json.loads(response.text)
     x_ref_events = list(filter(lambda x: x['event'] == 'cross-referenced', timeline))
     pr_events = list(filter(lambda x: 'pull_request' in x['source']['issue'], x_ref_events))
