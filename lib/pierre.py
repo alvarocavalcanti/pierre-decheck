@@ -30,6 +30,10 @@ def check(payload, headers, host):
     if not has_pull_request(payload):
         return {"statusCode": 201, "body": "Check has skipped because request body does not contain pull_request."}
 
+    return run_check(payload, host)
+
+
+def run_check(payload, host):
     owner, repo = get_owner_and_repo(payload)
     bodies = get_all_bodies(payload)
     this_pr_id = get_pull_request_id(payload)
