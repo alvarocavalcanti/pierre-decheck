@@ -300,3 +300,33 @@ def update_commit_status(owner, repo, sha, dependencies, host, are_dependencies_
 
 def is_external_dependency(dependency):
     return "#" in dependency
+
+
+def update_dependants(payload, headers, host):
+    merged = headers.get('X-GitHub-Event') == 'pull_request' and payload.get('pull_request').get('merged', False)
+    closed_or_reopened = headers.get('X-GitHub-Event') == 'issues' and payload.get('action') in ['closed', 'reopened']
+    logger.info("update_dependants: merged: {}, closed: {}".format(merged, closed_or_reopened))
+    if not (merged or closed_or_reopened):
+        return
+
+    pr_or_issue = 'pull_request' if merged else 'issue'
+    timeline_url = "{}repos/{}/issues/{}/timeline?per_page=100".format(
+        BASE_GITHUB_URL,
+        payload.get('repository').get('full_name'),
+        payload.get(pr_or_issue).get('number')
+    )
+
+    preview_headers = dict(HEADERS, Accept='application/vnd.github.mockingbird-preview')
+    response = requests.request('GET', timeline_url, headers=preview_headers)
+    if response.status_code != HTTP_200_OK:
+        logger.info("Failed to retrieve PR timeline for {}".format(timeline_url))
+        return
+
+    timeline = json.loads(response.text)
+    x_ref_events = list(filter(lambda x: x['event'] == 'cross-referenced', timeline))
+    pr_events = list(filter(lambda x: 'pull_request' in x['source']['issue'], x_ref_events))
+    open_pr_events = list(filter(lambda x: x['source']['issue']['state'] != 'closed', pr_events))
+    logger.info("{} cross-referenced PR found.".format(len(open_pr_events)))
+
+    for pr in open_pr_events:
+        run_check(pr.get('source').get('issue'), host)
