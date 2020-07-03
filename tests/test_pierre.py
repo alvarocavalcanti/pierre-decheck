@@ -15,6 +15,7 @@ from lib.pierre import (
     check,
     HEADERS,
     get_dependency_state,
+    update_dependants,
 )
 from tests.pierre import PierreTestCase
 
@@ -215,3 +216,123 @@ class TestPierre(PierreTestCase):
         issue_state = get_dependency_state("1", "foo", "bar")
 
         self.assertEqual("closed", issue_state)
+
+    @patch('lib.pierre.run_check')
+    @patch('lib.pierre.requests.request')
+    def test_update_dependants_upon_receiving_pr_merged_event(self, requests_mock, run_check_mock):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        request_response.text = open('tests/payloads/response/issues/timeline.json').read()
+        requests_mock.return_value = request_response
+
+        headers = dict(GITHUB_HEADERS, **{"X-GitHub-Event": "pull_request"})
+        payload = json.loads(open('tests/payloads/webhook/pull_request/closed.json').read())
+
+        update_dependants(payload, headers=headers, host=HOST)
+
+        expected_url = "{}repos/{}/{}/issues/{}/timeline?per_page=100".format(
+            BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "16"
+        )
+
+        headers = dict(HEADERS, Accept='application/vnd.github.mockingbird-preview')
+        requests_mock.assert_any_call('GET', expected_url, headers=headers)
+
+        timeline = json.loads(open('tests/payloads/response/issues/timeline.json').read())
+        pr = timeline[-1].get('source').get('issue')
+        run_check_mock.assert_called_once_with(pr, HOST)
+
+    @patch('lib.pierre.run_check')
+    @patch('lib.pierre.requests.request')
+    def test_update_dependants_upon_receiving_issue_reopened_event(self, requests_mock, run_check_mock):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        request_response.text = open('tests/payloads/response/issues/timeline.json').read()
+        requests_mock.return_value = request_response
+
+        headers = dict(GITHUB_HEADERS, **{"X-GitHub-Event": "issues"})
+        payload = json.loads(open('tests/payloads/webhook/issues/reopened.json').read())
+
+        update_dependants(payload, headers=headers, host=HOST)
+
+        expected_url = "{}repos/{}/{}/issues/{}/timeline?per_page=100".format(
+            BASE_GITHUB_URL,
+            "Codertocat",
+            "Hello-World",
+            "1"
+        )
+
+        headers = dict(HEADERS, Accept='application/vnd.github.mockingbird-preview')
+        requests_mock.assert_any_call('GET', expected_url, headers=headers)
+
+        timeline = json.loads(open('tests/payloads/response/issues/timeline.json').read())
+        pr = timeline[-1].get('source').get('issue')
+        run_check_mock.assert_called_once_with(pr, HOST)
+
+    @patch('lib.pierre.run_check')
+    @patch('lib.pierre.requests.request')
+    def test_not_update_dependants_upon_receiving_pr_closed_event(self, requests_mock, run_check_mock):
+        headers = dict(GITHUB_HEADERS, **{"X-GitHub-Event": "pull_request"})
+        payload = json.loads(open('tests/payloads/webhook/pull_request/closed.json').read())
+        payload['pull_request']['merged'] = False
+
+        update_dependants(payload, headers=headers, host=HOST)
+
+        requests_mock.assert_not_called()
+        run_check_mock.assert_not_called()
+
+    @patch('lib.pierre.run_check')
+    @patch('lib.pierre.requests.request')
+    def test_not_update_dependants_for_closed_pr(self, requests_mock, run_check_mock):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        timeline = json.loads(open('tests/payloads/response/issues/timeline.json').read())
+        timeline[-1]['source']['issue']['state'] = 'closed'
+        request_response.text = json.dumps(timeline)
+        requests_mock.return_value = request_response
+
+        headers = dict(GITHUB_HEADERS, **{"X-GitHub-Event": "pull_request"})
+        payload = json.loads(open('tests/payloads/webhook/pull_request/closed.json').read())
+
+        update_dependants(payload, headers=headers, host=HOST)
+
+        expected_url = "{}repos/{}/{}/issues/{}/timeline?per_page=100".format(
+            BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "16"
+        )
+
+        headers = dict(HEADERS, Accept='application/vnd.github.mockingbird-preview')
+        requests_mock.assert_any_call('GET', expected_url, headers=headers)
+
+        run_check_mock.assert_not_called()
+
+    @patch('lib.pierre.run_check')
+    @patch('lib.pierre.requests.request')
+    def test_not_update_dependants_for_issue(self, requests_mock, run_check_mock):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        timeline = json.loads(open('tests/payloads/response/issues/timeline.json').read())
+        del timeline[-1]['source']['issue']['pull_request']
+        request_response.text = json.dumps(timeline)
+        requests_mock.return_value = request_response
+
+        headers = dict(GITHUB_HEADERS, **{"X-GitHub-Event": "pull_request"})
+        payload = json.loads(open('tests/payloads/webhook/pull_request/closed.json').read())
+
+        update_dependants(payload, headers=headers, host=HOST)
+
+        expected_url = "{}repos/{}/{}/issues/{}/timeline?per_page=100".format(
+            BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "16"
+        )
+
+        headers = dict(HEADERS, Accept='application/vnd.github.mockingbird-preview')
+        requests_mock.assert_any_call('GET', expected_url, headers=headers)
+
+        run_check_mock.assert_not_called()
