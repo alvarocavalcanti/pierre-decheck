@@ -16,6 +16,7 @@ from lib.pierre import (
     HEADERS,
     get_dependency_state,
     update_dependants,
+    get_sha,
 )
 from tests.pierre import PierreTestCase
 
@@ -336,3 +337,34 @@ class TestPierre(PierreTestCase):
         requests_mock.assert_any_call('GET', expected_url, headers=headers)
 
         run_check_mock.assert_not_called()
+
+    @patch("requests.request")
+    def test_get_sha_from_pr_created_event(self, mock_request):
+        payload = json.loads(PR_CREATED)
+
+        sha = get_sha(payload)
+
+        self.assertEqual(payload.get("pull_request").get("head").get("sha"), sha)
+
+        mock_request.assert_not_called()
+
+    @patch("requests.request")
+    def test_get_sha_from_pr_comment_event(self, mock_request):
+        request_response = Mock()
+        request_response.status_code = HTTP_200_OK
+        request_response.text = '{"head":{"sha":"expected-sha"}}'
+
+        mock_request.return_value = request_response
+
+        expected_url = "{}repos/{}/{}/pulls/{}".format(
+            BASE_GITHUB_URL,
+            "alvarocavalcanti",
+            "pierre-decheck",
+            "28"
+        )
+
+        sha = get_sha(json.loads(PR_COMMENT_EVENT))
+
+        self.assertEqual("expected-sha", sha)
+
+        mock_request.assert_called_once_with('GET', expected_url, headers=HEADERS)
