@@ -22,7 +22,7 @@ For now, the best way of re-checkind the dependencies statuses is to add a new c
 1. Go to the repository you want to set it up, then go to **Settings > Webhooks > Add Webhook**
 1. Under "Payload URL" enter `<YOUR_APP_URL>/webhook`
 1. Under "Content type" select "application/json"
-1. Under "Which events would you like to trigger this webhook?" select "Let me select individual events." and then: "Commit comments", "Issue comments", "Pull requests" and "Pull request review comments"
+1. Under "Which events would you like to trigger this webhook?" select "Let me select individual events." and then: "Commit comments", "Issue comments", "Issues", "Pull requests" and "Pull request review comments"
 1. Finally, make sure "Active" is selected and then create the webhook
 1. [Create an access token for your repo](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) and grant it with either `repo:status` for _Public_ repos or `repo (Full control of private repositories)` for _Private_ repos.
 1. Add the token as an environment variable for you app, labeled `GITHUB_TOKEN`
