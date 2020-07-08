@@ -8,9 +8,24 @@ jobs:
       - run:
           name: Dependencies
           command: pip install -r requirements.txt -r requirements-dev.txt
+  linter:
+    docker:
+      - image: python:3
+    steps:
       - run:
           name: Flake8
           command: flake8 .
+  test:
+    docker:
+      - image: python:3
+    steps:
       - run:
           name: PyTests
           command: py.test tests
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - linter
+      - test
