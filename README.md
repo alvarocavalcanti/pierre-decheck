@@ -52,6 +52,8 @@ Usually when one has external dependencies (other repos) these dependencies requ
 1. [PyCharm](https://www.jetbrains.com/pycharm/) - Community edition is free and decent, Professional edition is awesome
 1. [VisualStudio Code](https://code.visualstudio.com/) - Completely free, large amount of extensions and great community support
 
+TESTING CIRCLE-CI
+
 ## References
 
 1. [Github Repo Statuses](https://developer.github.com/v3/repos/statuses/#create-a-status)
