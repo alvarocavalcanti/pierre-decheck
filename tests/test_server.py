@@ -1,6 +1,6 @@
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from flask_api import status
 
@@ -200,6 +200,42 @@ class ServerTest(PierreTestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         requests_mock.assert_not_called()
+
+    @patch('server.check')
+    @patch('lib.pierre.run_check')
+    @patch('lib.pierre.requests.request')
+    def test_update_dependants_upon_receiving_issue_closed_event(
+            self, requests_mock, run_check_mock, check_mock
+    ):
+        check_mock.return_value = {"statusCode": 201, "body": ""}
+
+        request_response = Mock()
+        request_response.status_code = status.HTTP_200_OK
+        request_response.text = open('tests/payloads/response/issues/timeline.json').read()
+        requests_mock.return_value = request_response
+
+        headers = dict(self.GITHUB_HEADERS, **{"X-GitHub-Event": "issues"})
+        payload = open('tests/payloads/webhook/issues/closed.json').read()
+
+        response = self.client.post(
+            "/webhook", headers=headers, data=payload, content_type='application/json'
+        )
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        expected_url_timeline = "{}repos/{}/{}/issues/{}/timeline?per_page=100".format(
+            pierre.BASE_GITHUB_URL,
+            "Codertocat",
+            "Hello-World",
+            "1"
+        )
+
+        headers = dict(request_headers, Accept='application/vnd.github.mockingbird-preview')
+        requests_mock.assert_any_call('GET', expected_url_timeline, headers=headers)
+        check_mock.assert_called_once()
+
+        timeline = json.loads(open('tests/payloads/response/issues/timeline.json').read())
+        pr = timeline[-1].get('source').get('issue')
+        run_check_mock.assert_called_once_with(pr, 'localhost')
 
 
 if __name__ == '__main__':

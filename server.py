@@ -2,7 +2,7 @@ import logging
 
 from flask import request
 from flask_api import FlaskAPI, status
-from lib.pierre import check
+from lib.pierre import check, update_dependants
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,6 +18,9 @@ def root_list():
 def webhook_event():
     app.logger.info("Received request with headers \n{}and data: \n{}".format(request.headers, request.data))
     result = check(request.data, request.headers, request.environ.get("HTTP_HOST"))
+
+    update_dependants(request.data, request.headers, request.environ.get("HTTP_HOST"))
+
     return result.get("body"), result.get("statusCode")
 
 
