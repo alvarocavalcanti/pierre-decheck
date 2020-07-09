@@ -1,24 +1,27 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+executors:
+  default:
     docker:
       - image: python:3
+commands:
+  setup:
     steps:
       - checkout
       - run:
           name: Dependencies
           command: pip install -r requirements.txt -r requirements-dev.txt
+jobs:
   linter:
-    docker:
-      - image: python:3
+    executor: default
     steps:
+      - setup
       - run:
           name: Flake8
           command: flake8 .
   test:
-    docker:
-      - image: python:3
+    executor: default
     steps:
+      - setup
       - run:
           name: PyTests
           command: py.test tests
@@ -26,6 +29,5 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
       - linter
       - test
