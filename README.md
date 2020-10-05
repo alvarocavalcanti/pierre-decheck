@@ -4,7 +4,7 @@
 
 ## Key Features
 
-It checks for dependant pull requests, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
+It checks for dependent pull requests, both same-repo and external, which should be defined by keywords on either pull request's body or comments:
 
 * Same repo: `Depends on #1`
 * External:
@@ -13,7 +13,7 @@ It checks for dependant pull requests, both same-repo and external, which should
 
 Pierre will perform checks only upon PR creation and Comment Activity (added/removed). In every case it will fetch all the PR's bodies (the PR body itself and from all its comments), extract the dependencies and perform the checks. Thus, it **does not** observe the dependencies themselves and re-run the checks if their status change.
 
-For now, the best way of re-checkind the dependencies statuses is to add a new comment. I suggest `pierre re-check`. :smiley:
+For now, the best way of re-checking the dependencies statuses is to add a new comment. I suggest `pierre re-check`. :smiley:
 
 ## Installation
 
