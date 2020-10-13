@@ -27,7 +27,10 @@ def webhook_event():
 @app.route("/details", methods=['GET'])
 def details():
     info = request.args.get('info')
-    dependencies_and_states = info.split('-')
+    #Modifying info to extract dependencies
+    info = info.split(':')
+    info = "".join(list(info[0]) + [dep.replace('-', ' ',1) for dep in info[1:]])
+    dependencies_and_states = info.split(' ')
     dependencies_info = [dep.replace(':', ' is ') for dep in dependencies_and_states]
 
     return {"dependencies": dependencies_info}, status.HTTP_200_OK
