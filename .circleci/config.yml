@@ -3,23 +3,29 @@ executors:
   default:
     docker:
       - image: python:3
+commands:
+    dependencies:
+      steps:
+        - checkout
+        - run:
+            name: Dependencies
+            command: pip install -r requirements.txt -r requirements-dev.txt
 jobs:
   build:
     executor: default
     steps:
-      - checkout
-      - run:
-          name: Dependencies
-          command: pip install -r requirements.txt -r requirements-dev.txt
+      - dependencies
   linter:
     executor: default
     steps:
+      - dependencies
       - run:
           name: Flake8
           command: flake8 .
   test:
     executor: default
     steps:
+      - dependencies
       - run:
           name: PyTests
           command: py.test tests
@@ -28,5 +34,9 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - linter
-      - test
+      - linter:
+          requires:
+            - build
+      - test:
+          requires:
+            - linter
