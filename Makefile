@@ -45,3 +45,6 @@ clean: down ## Delete local data and ensure containers are stopped
 
 unittest: setup ## Run unit tests
 	docker-compose run --rm dev bash -c "./bin/test.sh"
+
+validate-ci: ## Validates the CI configuration (requires Circle CI CLI)
+	circleci config validate
