@@ -28,9 +28,5 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - linter:
-          requires:
-            - build
-      - test:
-          requires:
-            - linter
+      - linter
+      - test
