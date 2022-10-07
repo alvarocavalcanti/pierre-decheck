@@ -1,5 +1,7 @@
 # Pierre DeCheck - A Dependent Pull-Request Checker
 
+#DISCLAIMER: THIS REPO IS NOW ARCHIVED
+
 [![CircleCI](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master.svg?style=svg)](https://circleci.com/gh/alvarocavalcanti/pierre-decheck/tree/master)
 
 ## Key Features
